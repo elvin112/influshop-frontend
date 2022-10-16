@@ -1,0 +1,45 @@
+:root {
+  --color-primary: #f73c49;
+  --color-primary--2: #f4a5ad;
+
+  --color-grey-light-1: #f6f6f6;
+  --color-grey-light-2: #f8f8f8;
+  --color-grey-light-3: #fdf1f2;
+  --color-grey-light-4: #ecdcdc;
+
+  --color-grey-dark-1: #070505ab;
+
+  --card-border-radius-1: 17px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+html {
+  box-sizing: border-box;
+  font-size: 87.5%; /* This equals to 14px */
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--color-grey-dark-2);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: 14px;
+}

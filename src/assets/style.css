@@ -3,9 +3,8 @@
   --color-primary--2: #f4a5ad;
 
   --color-grey-light-1: #f6f6f6;
-  --color-grey-light-2: #f8f8f8;
-  --color-grey-light-3: #fdf1f2;
-  --color-grey-light-4: #ecdcdc;
+  --color-grey-light-2: #fdf1f2;
+  --color-grey-light-3: #ecdcdc;
 
   --color-grey-dark-1: #070505ab;
 
@@ -25,7 +24,7 @@
 
 html {
   box-sizing: border-box;
-  font-size: 87.5%; /* This equals to 14px */
+  font-size: 16px; /* This equals to 14px */
 }
 
 body {
@@ -41,5 +40,18 @@ h3,
 h4,
 h5,
 h6 {
-  font-size: 14px;
+  font-size: 16px;
+}
+
+.btn {
+  border: 0;
+  border-radius: 17px;
+  font-size: 0.8rem;
+}
+
+.btn--primary {
+  color: var(--color-grey-light-1);
+  background-color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: 1px 1px 3px var(--color-primary);
 }

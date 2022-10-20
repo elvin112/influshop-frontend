@@ -248,7 +248,7 @@ export default {
 .content {
   position: absolute;
   left: 50%;
-  top: 14%;
+  top: 15%;
   transform: translateX(-50%);
 }
 
@@ -292,7 +292,7 @@ export default {
 }
 
 .form-card {
-  width: 20vw;
+  width: 22vw;
   height: auto;
   position: absolute;
   left: 50%;

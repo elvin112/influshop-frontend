@@ -13,36 +13,71 @@
 
         <ui-card class="form-card">
           <h4 class="form-card__title">Sign in</h4>
-          <form class="form-card__content">
-            <div class="input-control">
+          <form class="form-card__content" @submit.prevent="submitForm">
+            <div
+              class="input-control"
+              :class="{ 'input-control--danger': !isEmailValid }"
+            >
               <input
-                type="text"
+                id="email"
+                type="email"
                 class="auth-input"
-                placeholder="Username"
-                name=""
-                id=""
+                :class="{ 'auth-input--danger': !isEmailValid }"
+                placeholder="Email"
+                v-model="email"
               />
-              <svg class="input-icon">
-                <use xlink:href="../assets/img/sprite.svg#icon-user" />
+              <svg
+                class="input-icon"
+                :class="{ 'input-icon--danger': !isEmailValid }"
+              >
+                <use xlink:href="../assets/img/sprite.svg#icon-mail" />
               </svg>
             </div>
+            <span v-show="!isEmailValid" class="text-danger">{{
+              emailErrorMessage
+            }}</span>
 
-            <div class="input-control">
+            <div
+              class="input-control"
+              :class="{ 'input-control--danger': !isPasswordValid }"
+            >
               <input
+                id="password"
                 type="password"
                 class="auth-input"
+                :class="{ 'auth-input--danger': !isPasswordValid }"
                 placeholder="Password"
-                name=""
-                id=""
+                v-model="password"
               />
-              <svg class="input-icon">
+              <svg
+                class="input-icon"
+                :class="{ 'input-icon--danger': !isPasswordValid }"
+              >
                 <use xlink:href="../assets/img/sprite.svg#icon-key" />
               </svg>
             </div>
-            <button type="submit" class="btn btn--primary btn--form">
-              Get Started
-            </button>
-            <p class="have-account">Have an account? <span>Sign In</span></p>
+            <span
+              v-show="!isPasswordValid"
+              class="text-danger text-danger-margin-bottom"
+              >Please use between 8 and 20 characters.</span
+            >
+
+            <div class="button-control">
+              <span
+                v-show="isInternalError"
+                class="text-danger text-danger--server"
+                >{{ internalErrorMessage }}</span
+              >
+              <button type="submit" class="btn btn--primary btn--form">
+                Get Started
+              </button>
+              <p class="have-account">
+                Don't have an account?
+                <router-link to="/signup"
+                  ><span>Click here to join now!</span></router-link
+                >
+              </p>
+            </div>
           </form>
         </ui-card>
 
@@ -61,7 +96,110 @@
   </main>
 </template>
 
-<script></script>
+<script>
+export default {
+  data() {
+    return {
+      email: "",
+      password: "",
+      isEmailValid: true,
+      isPasswordValid: true,
+      isFormValid: true,
+      emailErrorMessage: "",
+      isInternalError: false,
+      internalErrorMessage: "",
+    };
+  },
+  methods: {
+    async submitForm() {
+      this.isEmailValid = true;
+      this.isPasswordValid = true;
+
+      this.isInternalError = false;
+
+      this.internalErrorMessage =
+        "*Something went wrong - Please try again later.";
+
+      this.validateEmail(this.email);
+      this.validatePassword(this.password);
+
+      if (!this.isEmailValid || !this.isPasswordValid) {
+        return;
+      }
+      const response = await fetch(
+        "http://localhost:8080/api/v1/auth/user/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: this.username,
+            email: this.email,
+            password: this.password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      console.log(data.status);
+      console.log(data.message);
+      if (data.status === 401) {
+        if (data.message === "Invalid email or password") {
+          this.internalErrorMessage = `* ${data.message}`;
+
+          this.isInternalError = true;
+        } else if (data.message === "A user with that email does not exist") {
+          this.internalErrorMessage = `* ${data.message}`;
+          this.isEmailValid = false;
+          this.isInternalError = true;
+        }
+      } else if (data.status === 500) {
+        this.internalErrorMessage =
+          "*Something went wrong - Please try again later.";
+        this.isInternalError = true;
+      } else if (data.message === "User Successfully Logged In") {
+        alert("User Successfully Logged In!");
+      }
+    },
+
+    validateEmail(newValue) {
+      this.isEmailValid = true;
+      if (typeof newValue != "undefined") {
+        if (
+          !newValue.includes("@") ||
+          newValue.length < 4 ||
+          newValue.length > 35
+        ) {
+          this.isEmailValid = false;
+          this.isFormValid = false;
+          this.emailErrorMessage = "Please enter a valid email address.";
+        }
+      }
+    },
+    validatePassword(newValue) {
+      this.isPasswordValid = true;
+      if (typeof newValue != "undefined") {
+        if (newValue.length < 8 || newValue.length > 20) {
+          this.isPasswordValid = false;
+          this.isFormValid = false;
+        }
+      }
+    },
+  },
+  watch: {
+    username(value) {
+      this.validateUsername(value);
+    },
+    email(value) {
+      this.validateEmail(value);
+    },
+    password(value) {
+      this.validatePassword(value);
+    },
+  },
+};
+</script>
 
 <script setup></script>
 
@@ -75,7 +213,7 @@
 }
 
 .header__banner {
-  font-size: 19.7rem;
+  font-size: 18.7rem;
   font-weight: 800;
   text-align: center;
   color: var(--color-grey-light-1);
@@ -130,11 +268,11 @@
 }
 
 .form-card {
-  width: 20vw;
-  height: 53vh;
+  width: 22vw;
+  height: auto;
   position: absolute;
   left: 50%;
-  top: 20%;
+  top: 19%;
   transform: translateX(-50%);
   border-radius: var(--card-border-radius-1);
   display: flex;
@@ -164,16 +302,20 @@
 }
 
 .form-card__content {
-  margin-top: 3rem;
+  margin-top: 2rem;
   display: flex;
   flex-direction: column;
   width: 80%;
 }
 .input-control {
-  margin-bottom: 1.7rem;
+  margin-bottom: 1.5rem;
   width: 100%;
   position: relative;
   border-bottom: 1px solid var(--color-grey-light-3);
+}
+
+.input-control--danger {
+  border-bottom: 1px solid red;
 }
 
 .auth-input,
@@ -183,6 +325,10 @@
   outline: none !important;
   border: 0;
   width: 85%;
+}
+
+.auth-input--danger::placeholder {
+  color: red;
 }
 
 .input-icon {
@@ -195,10 +341,17 @@
   stroke: var(--color-grey-dark-1);
 }
 
+.input-icon--danger {
+  stroke: red;
+}
+
+.button-control {
+  margin-top: 1.1rem;
+  text-align: center;
+}
 .btn--form {
   width: 100%;
   padding: 0.7rem;
-  margin-top: 1rem;
 }
 
 .have-account {
@@ -206,10 +359,13 @@
   display: inline-block;
   margin: 0 auto;
   margin-top: 0.2rem;
+  margin-bottom: 1.6rem;
 }
 
-.have-account span {
+.have-account span,
+a {
   color: var(--color-primary);
+  text-decoration: none;
 }
 
 .return-home {
@@ -246,5 +402,20 @@
   transform: translateY(-50%);
   line-height: 1;
   align-items: center;
+}
+
+.text-danger {
+  font-family: "Montserrat, sans-serif";
+  font-size: 0.7rem;
+  margin-bottom: 0.8rem;
+  margin-top: -1.3rem;
+  color: red;
+}
+
+.text-danger--server {
+  margin-top: 0.5rem;
+}
+.text-danger-margin-bottom {
+  margin-bottom: 0.8rem;
 }
 </style>

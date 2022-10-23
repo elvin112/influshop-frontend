@@ -24,7 +24,7 @@
 
 html {
   box-sizing: border-box;
-  font-size: 16px; /* This equals to 14px */
+  font-size: 18px; /* This equals to 14px */
 }
 
 body {
@@ -40,7 +40,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-size: 16px;
+  font-size: 1px;
 }
 
 .btn {

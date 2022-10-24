@@ -259,6 +259,6 @@ export default {
 
 <script setup></script>
 
-<style scoped>
+<style scoped lang="scss">
 @import "Signup.module.scss";
 </style>

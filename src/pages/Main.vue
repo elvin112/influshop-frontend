@@ -1,32 +1,34 @@
 <template>
   <div class="wrapper">
     <header>
-      <div class="header-1"></div>
-      <div class="header-2"></div>
-      <div class="header-3"></div>
+      <TheHeader />
     </header>
-    <main>Main</main>
-    <aside>Aside</aside>
-    <footer>Footer</footer>
+    <main>
+      <h3>Main Content</h3>
+    </main>
+    <aside>Sidebar</aside>
+    <footer>
+      <TheFooter />
+    </footer>
   </div>
 </template>
 
 <style scoped>
 .wrapper {
   display: grid;
-  grid-template-rows: repeat(3, 1fr);
-  grid-template-columns: repeat(1, 1fr);
+  grid-template-rows: repeat(4, min-content);
+  grid-template-columns: 24% 1fr;
 }
 
 header {
   display: grid;
-  grid-template-rows: repeat(3, 1fr);
-  background-color: orangered;
   grid-row: 1 / 2;
+  grid-column: 1 / -1;
+  height: auto;
 }
 
 main {
-  background-color: green;
+  background-color: rgb(109, 128, 0);
   grid-row: 2 / 3;
   grid-column: 2 / -1;
 }
@@ -40,9 +42,5 @@ footer {
   background-color: gray;
   grid-row: 3 / -1;
   grid-column: 1 / -1;
-}
-
-.header-1 {
-  background-color: var(--color-grey-light-1);
 }
 </style>

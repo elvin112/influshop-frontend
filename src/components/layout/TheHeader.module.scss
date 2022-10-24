@@ -1,0 +1,43 @@
+.header-1 {
+  display: flex;
+  height: 27px;
+  background-color: var(--color-grey-light-2);
+  padding: var(--content-padding);
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  .download-app {
+    font-family: "Montserrat", sans-serif;
+    font-size: 0.6rem;
+    display: flex;
+    font-weight: 800;
+    &__icon {
+      width: 1rem;
+      height: 1rem;
+      fill: transparent;
+      stroke: var(--color-grey-dark-1);
+    }
+  }
+
+  .menu {
+    .menu-nav li {
+      display: inline-block;
+      font-weight: 800;
+      font-family: "Montserrat", sans-serif;
+      font-size: 0.7rem;
+      line-height: 1;
+    }
+
+    li:not(:last-child) {
+      margin-right: 1rem;
+    }
+  }
+}
+
+.header-2 {
+  padding: var(--content-padding);
+  height: 65px;
+  display: flex;
+  align-items: center;
+}

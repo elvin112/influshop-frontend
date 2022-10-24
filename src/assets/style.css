@@ -3,12 +3,21 @@
   --color-primary--2: #f4a5ad;
 
   --color-grey-light-1: #f6f6f6;
-  --color-grey-light-2: #fdf1f2;
+  --color-grey-light-2: #f1f1f1;
   --color-grey-light-3: #ecdcdc;
 
   --color-grey-dark-1: #070505ab;
+  --color-grey-dark-2: #a7a5a5;
 
   --card-border-radius-1: 17px;
+
+  --content-padding: 0 7%;
+  --account-settings-padding: 0 16%;
+
+  --card-border-radius: 4px;
+
+  --shadow-dark: 0 2rem 6rem rgba(0, 0, 0, 0.3);
+  --shadow-light: 0 2rem 5rem rgba(0, 0, 0, 0.06);
 }
 
 * {
@@ -24,7 +33,7 @@
 
 html {
   box-sizing: border-box;
-  font-size: 18px; /* This equals to 14px */
+  font-size: 112.5%; /* This equals to 18px */
 }
 
 body {
@@ -40,7 +49,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-size: 1px;
+  font-size: 1rem;
 }
 
 .btn {

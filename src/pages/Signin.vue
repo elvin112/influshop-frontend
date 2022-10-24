@@ -230,6 +230,6 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 @import "Signin.module.scss";
 </style>

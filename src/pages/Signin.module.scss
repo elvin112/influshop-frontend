@@ -38,7 +38,7 @@
   position: absolute;
   top: 1.4rem;
   left: 2rem; /* This is equal to 32px */
-  font-family: "Montserrat, sans-serif";
+  font-family: "Montserrat", sans-serif;
   font-size: 1.5rem;
   font-weight: 800;
   color: var(--color-grey-light-2);
@@ -48,7 +48,7 @@
   position: absolute;
   top: 50%;
   left: 2rem; /* This is equal to 32px */
-  font-family: "Montserrat, sans-serif";
+  font-family: "Montserrat", sans-serif;
   font-size: 1.4rem;
   color: var(--color-grey-light-2);
   transform: translateY(-50%);
@@ -63,6 +63,7 @@
 
 .form-card {
   width: 22vw;
+  min-height: 62vh;
   height: auto;
   position: absolute;
   left: 50%;
@@ -78,7 +79,7 @@
 .form-card__title {
   color: inherit;
   text-transform: uppercase;
-  font-family: "Montserrat, sans-serif";
+  font-family: "Montserrat", sans-serif;
   font-weight: 300;
   font-size: 1rem;
   padding-top: 1.4rem;
@@ -140,7 +141,7 @@
 }
 
 .button-control {
-  margin-top: 1.1rem;
+  margin-top: 2.6rem;
   text-align: center;
 }
 .btn--form {
@@ -168,7 +169,7 @@ a {
   display: flex;
   bottom: 2%;
   left: 2rem; /* This is equal to 32px */
-  font-family: "Montserrat, sans-serif";
+  font-family: "Montserrat", sans-serif;
   font-size: 0.7rem;
   font-weight: 600;
   color: var(--color-grey-light-2);
@@ -190,7 +191,7 @@ a {
   display: flex;
   bottom: 2%;
   right: 2rem; /* This is equal to 32px */
-  font-family: "Montserrat, sans-serif";
+  font-family: "Montserrat", sans-serif;
   font-size: 0.6rem;
   font-weight: 600;
   color: var(--color-grey-dark-1);
@@ -200,7 +201,7 @@ a {
 }
 
 .text-danger {
-  font-family: "Montserrat, sans-serif";
+  font-family: "Montserrat", sans-serif;
   font-size: 0.7rem;
   margin-bottom: 0.8rem;
   margin-top: -1.3rem;
@@ -215,7 +216,7 @@ a {
 }
 
 .whoami {
-  font-family: "Montserrat, sans-serif";
+  font-family: "Montserrat", sans-serif;
   font-size: 0.8rem;
 }
 

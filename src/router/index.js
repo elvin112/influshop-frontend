@@ -4,6 +4,7 @@ import Signup from "../pages/Singup.vue";
 import Main from "../pages/Main.vue";
 import UserSettings from "../pages/UserSettings.vue";
 import AddItem from "../components/item/AddItem.vue";
+import StoreSettings from "../components/item/StoreSettings.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,9 +28,13 @@ const router = createRouter({
       path: "/userSettings",
       name: "userSettings",
       component: UserSettings,
-      children: [{ path: "/addNew", component: AddItem }], //  /accountSettings/addNew
+      children: [
+        { path: "/settings", redirect: "/settings/store" },
+        { path: "/settings/store", component: StoreSettings },
+      ],
     },
   ],
+  linkActiveClass: "active",
 });
 
 export default router;

@@ -10,9 +10,15 @@
       <div class="menu">
         <nav class="menu-nav">
           <ul>
-            <li class="menu-nav__item--1">Home</li>
-            <li class="menu-nav__item--2">Contact Us</li>
-            <li class="menu-nav__item--3">About Us</li>
+            <li class="menu-nav__item--1">
+              <router-link to="/">Home</router-link>
+            </li>
+            <li class="menu-nav__item--2">
+              <router-link to="/">Contact Us</router-link>
+            </li>
+            <li class="menu-nav__item--3">
+              <router-link to="/">About Us</router-link>
+            </li>
           </ul>
         </nav>
       </div>

@@ -32,6 +32,16 @@
     li:not(:last-child) {
       margin-right: 1rem;
     }
+    a:hover,
+    .active {
+      color: var(--color-primary--3);
+    }
+    a {
+      text-decoration: none;
+      font-weight: 700;
+      color: var(--color-grey-light-4);
+      padding-left: 0.3rem;
+    }
   }
 }
 

@@ -39,14 +39,6 @@ footer {
   grid-column: 1 / -1;
 }
 
-.return-home__icon {
-  fill: var(--color-primary);
-  // stroke: var(--color-primary);
-  width: 1.1rem;
-  height: 1.1rem;
-  display: inline-block;
-}
-
 .aside-nav__group {
   list-style-type: none;
   margin: 0;
@@ -67,48 +59,66 @@ footer {
       transform: translateX(-50%);
       height: 1.4rem;
       width: 0.1rem;
-      background-color: var(--color-primary);
+      background-color: var(--color-grey-light-5);
     }
   }
 
   &-item {
+    .aside-nav__group-item-icon--1 {
+      fill: var(--color-grey-light-5);
+      // stroke: var(--color-primary);
+      width: 1.1rem;
+      height: 1.1rem;
+      display: inline-block;
+    }
     a {
       text-decoration: none;
-      color: var(--color-primary);
+      color: var(--color-grey-light-5);
       font-family: "Montserrat", sans-serif;
       font-size: 0.9rem;
       font-weight: 500;
       padding-left: 0.3rem;
     }
-    a:hover,
+
     .active {
       color: var(--color-primary--3);
-    }
-  }
-}
 
-.main-tab-group {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
+      &::before {
+        content: "";
+        position: absolute;
 
-  &__item:not(:last-child) {
-    margin-right: 3rem;
-  }
+        left: 100%;
+        transform: translateX(-50%);
+        height: 1.4rem;
+        width: 0.1rem;
+        background-color: var(--color-primary--3);
+      }
 
-  &__item {
-    a,
-    a:visited {
-      text-decoration: none;
-      font-family: "Montserrat", sans-serif;
-      font-size: 0.95rem;
-      color: var(--color-grey-light-4);
+      .aside-nav__group-item-icon--1 {
+        fill: var(--color-primary--3);
+      }
     }
 
-    a:hover,
-    .active {
-      color: var(--color-primary--3);
+    &:hover {
+      &::before {
+        content: "";
+        content: "";
+        position: absolute;
+
+        left: 100%;
+        transform: translateX(-50%);
+        height: 1.4rem;
+        width: 0.1rem;
+        background-color: var(--color-primary--3);
+      }
+
+      a {
+        color: var(--color-primary--3);
+      }
+
+      .aside-nav__group-item-icon--1 {
+        fill: var(--color-primary--3);
+      }
     }
   }
 }

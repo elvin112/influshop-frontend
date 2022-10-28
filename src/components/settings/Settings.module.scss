@@ -1,0 +1,59 @@
+.main-tab-group {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+
+  &__item {
+    position: relative;
+  }
+
+  &__item:not(:last-child) {
+    margin-right: 4rem;
+  }
+
+  &__item {
+    a {
+      text-decoration: none;
+      font-family: "Montserrat", sans-serif;
+      font-size: 0.95rem;
+      color: var(--color-grey-light-4);
+    }
+    .active {
+      color: var(--color-primary--3);
+
+      &::before {
+        content: "";
+        position: absolute;
+
+        top: 103%;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 0.1rem;
+        width: 8.8rem;
+        background-color: var(--color-primary--3);
+      }
+    }
+
+    &:hover {
+      a {
+        color: var(--color-primary--3);
+      }
+      &::before {
+        background-color: var(--color-primary--3);
+      }
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+
+      top: 103%;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 0.1rem;
+      width: 8.8rem;
+      background-color: var(--color-grey-light-6);
+    }
+  }
+}

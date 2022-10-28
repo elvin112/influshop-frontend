@@ -3,6 +3,7 @@ import Signin from "../pages/Signin.vue";
 import Signup from "../pages/Singup.vue";
 import Main from "../pages/Main.vue";
 import UserSettings from "../pages/UserSettings.vue";
+import Settings from "../components/settings/Settings.vue";
 import AddItem from "../components/item/AddItem.vue";
 import StoreSettings from "../components/item/StoreSettings.vue";
 
@@ -29,8 +30,25 @@ const router = createRouter({
       name: "userSettings",
       component: UserSettings,
       children: [
-        { path: "/settings", redirect: "/settings/store" },
-        { path: "/settings/store", component: StoreSettings },
+        {
+          path: "/userSettings/settings",
+          name: "settings",
+          component: Settings,
+          children: [
+            {
+              path: "/userSettings/settings/store",
+              name: "storeSettings",
+              component: StoreSettings,
+              children: [
+                {
+                  path: "/userSettings/settings/store/addNew",
+                  name: "addNewItem",
+                  component: AddItem,
+                },
+              ],
+            },
+          ],
+        },
       ],
     },
   ],

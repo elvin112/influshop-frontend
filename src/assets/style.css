@@ -7,9 +7,13 @@
   --color-grey-light-2: #f1f1f1;
   --color-grey-light-3: #ecdcdc;
   --color-grey-light-4: #717b8c;
+  --color-grey-light-5: #4c535f;
+  --color-grey-light-6: #e0e4ec;
+
+  --color-success: #4bb543;
+  --color-success-hover: #45a53e;
 
   --color-grey-dark-1: #070505ab;
-  --color-grey-dark-2: #a7a5a5;
 
   --card-border-radius-1: 17px;
 
@@ -42,7 +46,7 @@ body {
   font-family: "Montserrat", sans-serif;
   font-weight: 500;
   line-height: 1.6;
-  color: var(--color-grey-dark-2);
+  color: var(--color-grey-light-5);
 }
 
 h1,
@@ -57,7 +61,13 @@ h6 {
 .btn {
   border: 0;
   border-radius: 17px;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  padding: 0.83rem 1.77rem;
 }
 
 .btn--primary {
@@ -65,4 +75,29 @@ h6 {
   background-color: var(--color-primary);
   font-weight: 600;
   box-shadow: 1px 1px 3px var(--color-primary);
+  cursor: pointer;
+}
+
+.btn--primary:hover {
+  background-color: var(--color-primary--3);
+}
+
+.btn--cancel {
+  background-color: var(--color-grey-light-2);
+  color: red;
+}
+
+.btn--cancel:hover {
+  background-color: var(--color-grey-light-2);
+  color: rgb(247, 116, 116);
+}
+
+.btn--success {
+  background-color: var(--color-success);
+  color: white;
+}
+
+.btn--success:hover {
+  background-color: var(--color-success-hover);
+  color: white;
 }

@@ -30,7 +30,7 @@
                 class="input-icon"
                 :class="{ 'input-icon--danger': !isEmailValid }"
               >
-                <use xlink:href="../assets/img/sprite.svg#icon-mail" />
+                <use xlink:href="../../assets/img/sprite.svg#icon-mail" />
               </svg>
             </div>
             <span v-show="!isEmailValid" class="text-danger">{{
@@ -53,7 +53,7 @@
                 class="input-icon"
                 :class="{ 'input-icon--danger': !isPasswordValid }"
               >
-                <use xlink:href="../assets/img/sprite.svg#icon-key" />
+                <use xlink:href="../../assets/img/sprite.svg#icon-key" />
               </svg>
             </div>
             <span
@@ -110,7 +110,7 @@
 
         <div class="return-home">
           <svg class="return-home__icon">
-            <use xlink:href="../assets/img/sprite.svg#icon-arrow_back_ios" />
+            <use xlink:href="../../assets/img/sprite.svg#icon-arrow_back_ios" />
           </svg>
           <span>Home</span>
         </div>
@@ -154,41 +154,36 @@ export default {
       if (!this.isEmailValid || !this.isPasswordValid) {
         return;
       }
-      const response = await fetch(
-        `http://localhost:8080/api/v1/auth/${this.pickedUserType}/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: this.username,
-            email: this.email,
-            password: this.password,
-          }),
-        }
-      );
+
+      const actionPayload = {
+        username: this.username,
+        email: this.email,
+        password: this.password,
+        pickedUserType: this.pickedUserType,
+      };
+
+      const response = await this.$store.dispatch("auth/signin", actionPayload);
       this.pickedUserType = null;
 
       const data = await response.json();
-      console.log(data.status);
-      console.log(data.message);
-      if (data.status === 401) {
-        if (data.message === "Invalid email or password") {
-          this.internalErrorMessage = `* ${data.message}`;
+      if (response.ok) {
+        alert("User Successfully Logged In!");
+      } else {
+        if (data.status === 401) {
+          if (data.message === "Invalid email or password") {
+            this.internalErrorMessage = `* ${data.message}`;
 
-          this.isInternalError = true;
-        } else if (data.message.includes("with that email does not exist")) {
-          this.internalErrorMessage = `* ${data.message}`;
-          this.isEmailValid = false;
+            this.isInternalError = true;
+          } else if (data.message.includes("with that email does not exist")) {
+            this.internalErrorMessage = `* ${data.message}`;
+            this.isEmailValid = false;
+            this.isInternalError = true;
+          }
+        } else if (data.status === 500) {
+          this.internalErrorMessage =
+            "*Something went wrong - Please try again later.";
           this.isInternalError = true;
         }
-      } else if (data.status === 500) {
-        this.internalErrorMessage =
-          "*Something went wrong - Please try again later.";
-        this.isInternalError = true;
-      } else if (data.message === "User Successfully Logged In") {
-        alert("User Successfully Logged In!");
       }
     },
 

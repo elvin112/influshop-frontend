@@ -1,6 +1,9 @@
 import { createApp } from "vue";
+
 import App from "./App.vue";
 import router from "./router";
+import store from "./store/index.js";
+
 import BalmUI from "balm-ui"; // Official Google Material Components
 import BalmUIPlus from "balm-ui-plus"; // BalmJS Team Material Components
 import "balm-ui-css";
@@ -16,9 +19,10 @@ app.component("TheFooter", TheFooter);
 app.component("BaseLogo", BaseLogo);
 app.component("BaseCard", BaseCard);
 
-app.use(router);
-
 app.use(BalmUI);
 app.use(BalmUIPlus);
+
+app.use(router);
+app.use(store);
 
 app.mount("#app");

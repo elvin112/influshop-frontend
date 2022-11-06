@@ -21,9 +21,14 @@
   --account-settings-padding: 0 16%;
 
   --card-border-radius: 4px;
+  --input-border-radius: 4px;
 
   --shadow-dark: 0 2rem 6rem rgba(0, 0, 0, 0.3);
   --shadow-light: 0 2rem 5rem rgba(0, 0, 0, 0.06);
+}
+
+.mb-sm {
+  margin-bottom: 1rem;
 }
 
 * {
@@ -68,14 +73,56 @@ h6 {
   font-family: "Montserrat", sans-serif;
   font-weight: 800;
   padding: 0.83rem 1.77rem;
+  transition: all 0.2s;
+  cursor: pointer;
 }
 
+.content input {
+  width: 90%;
+}
+
+.property input {
+  width: 60%;
+}
+
+.input-icon-bin {
+  width: 1rem;
+  height: 1rem;
+  fill: #e20000;
+}
 .btn--primary {
   color: var(--color-grey-light-1);
   background-color: var(--color-primary);
   font-weight: 600;
   box-shadow: 1px 1px 3px var(--color-primary);
+}
+
+.prop-cont-extra-container {
+  display: grid;
+  grid-template-columns: 40% 1fr;
+}
+
+.extra-prop-content-field input {
+  width: 60%;
+}
+
+.btn--tertiary {
+  color: var(--color-grey-light-5);
+  background-color: yellow;
+  font-weight: 600;
+  box-shadow: 1px 1px 3px yellow;
+  font-size: 0.7rem;
+  padding: 0.01rem 1.05rem;
+  width: auto;
+  height: 2rem;
   cursor: pointer;
+  display: block;
+  /* border-radius: 0; */
+}
+
+.btn--tertiary:hover {
+  background-color: rgb(255, 255, 149);
+  box-shadow: 1px 1px 3px rgb(255, 255, 149);
 }
 
 .btn--primary:hover {
@@ -101,3 +148,19 @@ h6 {
   background-color: var(--color-success-hover);
   color: white;
 }
+
+.form-input--primary {
+  padding: 0.4rem;
+  border-radius: var(--input-border-radius);
+  border: 1px solid var(--color-grey-light-4);
+}
+
+/* .form-input--primary:hover {
+  outline: none;
+  border: 1px solid var(--color-blue-1);
+}
+
+.form-input--primary:focus {
+  outline: none;
+  border: 1px solid var(--color-blue-1);
+} */

@@ -30,7 +30,7 @@
                 class="input-icon"
                 :class="{ 'input-icon--danger': !isUsernameValid }"
               >
-                <use xlink:href="../assets/img/sprite.svg#icon-user" />
+                <use xlink:href="../../assets/img/sprite.svg#icon-user" />
               </svg>
             </div>
             <span v-show="!isUsernameValid" class="text-danger">{{
@@ -53,7 +53,7 @@
                 class="input-icon"
                 :class="{ 'input-icon--danger': !isEmailValid }"
               >
-                <use xlink:href="../assets/img/sprite.svg#icon-mail" />
+                <use xlink:href="../../assets/img/sprite.svg#icon-mail" />
               </svg>
             </div>
             <span v-show="!isEmailValid" class="text-danger">{{
@@ -76,7 +76,7 @@
                 class="input-icon"
                 :class="{ 'input-icon--danger': !isPasswordValid }"
               >
-                <use xlink:href="../assets/img/sprite.svg#icon-key" />
+                <use xlink:href="../../assets/img/sprite.svg#icon-key" />
               </svg>
             </div>
             <span
@@ -118,7 +118,7 @@
               <span
                 v-show="isInternalError"
                 class="text-danger text-danger--server"
-                >*Something went wrong - Please try again later.</span
+                >*Failed to authenticate - Check your data.</span
               >
               <button type="submit" class="btn btn--primary btn--form">
                 Get Started
@@ -133,7 +133,7 @@
 
         <div class="return-home">
           <svg class="return-home__icon">
-            <use xlink:href="../assets/img/sprite.svg#icon-arrow_back_ios" />
+            <use xlink:href="../../assets/img/sprite.svg#icon-arrow_back_ios" />
           </svg>
           <span>Home</span>
         </div>
@@ -192,21 +192,22 @@ export default {
       this.pickedUserType = null;
 
       const data = await response.json();
+
       console.log(data.status);
       console.log(data.message);
 
-      if (data.status === 409) {
+      if (response.ok) {
+        alert(data.message);
+      } else if (!response.ok && data) {
         if (data.message.includes("Username already exists")) {
           this.usernameErrorMessage = data.message;
           this.isUsernameValid = false;
         } else if (data.message === "Email already exists") {
           this.emailErrorMessage = data.message;
           this.isEmailValid = false;
+        } else {
+          this.isInternalError = true;
         }
-      } else if (data.status === 500) {
-        this.isInternalError = true;
-      } else if (data.message.includes("Successfully Created")) {
-        alert(data.message);
       }
     },
     validateUsername(newValue) {

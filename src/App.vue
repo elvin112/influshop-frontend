@@ -1,7 +1,13 @@
-<script setup>
-import { RouterLink, RouterView } from "vue-router";
-</script>
-
 <template>
   <RouterView />
 </template>
+
+<script>
+import { RouterLink, RouterView } from "vue-router";
+
+export default {
+  created() {
+    this.$store.dispatch("auth/tryLogin");
+  },
+};
+</script>

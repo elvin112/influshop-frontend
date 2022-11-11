@@ -13,8 +13,8 @@ export default {
     if (!response.ok) {
       throw Error("Internal server error");
     } else {
-      const data = response.json();
-      console.log(data);
+      const data = await response.json();
+      context.commit("setInfluencerItems", data.items);
     }
   },
 };

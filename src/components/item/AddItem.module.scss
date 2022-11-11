@@ -155,4 +155,10 @@
     //   }
     // }
   }
+
+  .disabled {
+    cursor: not-allowed;
+    background-color: rgb(229, 229, 229) !important;
+    box-shadow: none;
+  }
 }

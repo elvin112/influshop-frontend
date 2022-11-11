@@ -1,0 +1,40 @@
+.wrapper {
+  margin-top: 1rem;
+  .introductory {
+    display: grid;
+    grid-template-columns: 17% 25% 1fr 1fr 1fr;
+    gap: 0.5rem;
+
+    &__header-title {
+      font-size: 0.8rem;
+      font-family: "Montserrat", sans-serif;
+      color: var(--color-grey-light-4);
+    }
+  }
+
+  .items ul li {
+    display: grid;
+    grid-template-columns: 17% 25% 1fr 1fr 1fr;
+
+    color: var(--color-grey-light-4);
+    font-family: "Montserrat", sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.8rem 0;
+    gap: 0.5rem;
+
+    p {
+      overflow: hidden;
+    }
+
+    .item__availability {
+    }
+  }
+}
+
+hr {
+  width: 95%;
+  height: 15px;
+  border: none;
+  border-top: 2px solid var(--color-grey-light-2);
+}

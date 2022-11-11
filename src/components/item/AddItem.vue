@@ -215,7 +215,7 @@
               v-model="selectedItemGroup"
             >
               <option :key="groupName" v-for="groupName in itemGroups">
-                {{ groupName }}
+                {{ groupName["itemGroupName"] }}
               </option>
               <option>+ Adding to New Item Group</option>
             </select>
@@ -233,33 +233,51 @@
               class="form-input--primary"
             />
           </div>
+          <div
+            v-if="isCreatingGroup"
+            class="add-item-form__form-control full-width"
+          >
+            <label for="new-group-name">Group description:</label>
+            <input
+              type="text"
+              id="group-description"
+              v-model="newItemGroupDescription"
+              class="form-input--primary"
+            />
+          </div>
+
+          <div
+            v-if="!isCreatingGroup"
+            class="add-item-form__form-control full-width"
+          ></div>
 
           <div class="property-content-container">
             <br />
             <div class="property">
               <label for="property-name">Property:</label>
               <input
-                required
                 type="text"
                 id="property-name"
                 placeholder="e.g., color, size"
                 class="form-input--primary mb-sm property-name"
+                ref="property-name-first-row"
               />
             </div>
             <div class="content">
               <label for="content-name">Content:</label>
               <input
-                required
                 type="text"
                 id="content-name"
                 class="form-input--primary mb-sm content__first-content content-name"
                 placeholder="e.g., red, blue, green"
+                ref="content-name-first-row"
               />
             </div>
             <button
               type="button"
               class="btn btn--tertiary"
               @click="addPropContentField"
+              :class="{ disabled: isAddFieldDisabled }"
             >
               <svg class="input-icon-plus-circle">
                 <use
@@ -327,18 +345,94 @@ export default {
       try {
         const fetchedItemGroups = await this.fetchItemGroups();
         fetchedItemGroups.forEach((itemGroup) => {
-          this.itemGroups.push(itemGroup.itemGroupName);
+          this.itemGroups.push({
+            itemGroupName: itemGroup.itemGroupName,
+            itemGroup: itemGroup,
+          });
         });
       } catch (error) {
         console.log("Couldn't fetch item groups");
       }
     },
     selectedItemGroup(value) {
+      // deleting extra fields block
+      const extraPropContNodes = this.$refs["extra-prop-content-field"];
+      if (extraPropContNodes) {
+        extraPropContNodes.innerHTML = "";
+      }
+
       if (value === "+ Adding to New Item Group") {
         this.isCreatingGroup = true;
+        this.isAddFieldDisabled = false;
+
+        const firstPropEl = this.$refs["property-name-first-row"];
+        const firstContentEl = this.$refs["content-name-first-row"];
+        firstPropEl.value = "";
+        firstContentEl.value = "";
+        firstPropEl.disabled = false;
+
         return;
       } else {
         this.isCreatingGroup = false;
+        const firstPropEl = this.$refs["property-name-first-row"];
+        const firstContentEl = this.$refs["content-name-first-row"];
+        firstPropEl.value = "";
+        firstContentEl.value = "";
+        firstPropEl.disabled = false;
+
+        /* 1. check if "Add field" button should be disabled.
+           2. todo
+        */
+        const tempGroupItem = this.itemGroups.filter(
+          (itemGroup) => itemGroup.itemGroupName === value
+        );
+        const itemGroup = tempGroupItem[0].itemGroup;
+        this.itemGroupId = itemGroup.id;
+        let itemGroupExtraFeatures = itemGroup.extraFeatures;
+        this.isAddFieldDisabled = false;
+
+        this.listOfProperties = [];
+        for (const property in itemGroupExtraFeatures) {
+          this.listOfProperties.push(property);
+          if (itemGroupExtraFeatures[property]) {
+            if (itemGroupExtraFeatures[property].length !== 0) {
+              this.isAddFieldDisabled = true;
+            }
+          } else {
+            this.isAddFieldDisabled = false;
+          }
+        }
+        for (let index = 0; index < this.listOfProperties.length; index++) {
+          if (index === 0) {
+            // add value parameter to property of only first row
+            firstPropEl.value = this.listOfProperties[index];
+            firstPropEl.disabled = true;
+          } else {
+            const propertyInput = `<div class="prop-cont-extra-container"><div class="mb-sm"><input
+        type="text"
+        id="property-name"
+        placeholder="e.g., color, size"
+        class="form-input--primary property-name"
+        value=${this.listOfProperties[index]}
+        disabled
+      /></div><div class="mb-sm"><input
+
+                type="text"
+                id="content-name"
+                class="form-input--primary content-name"
+                placeholder="e.g., red, blue, green "/>
+
+              </div></div>`;
+
+            this.$refs["extra-prop-content-field"].insertAdjacentHTML(
+              "beforeend",
+              propertyInput
+            );
+          }
+        }
+        // if (tempGroupItem) {
+
+        // }
       }
     },
   },
@@ -357,10 +451,16 @@ export default {
       hasExtraFeatureFormatted: false,
       selectedItemGroup: null,
       itemGroups: [],
+      itemGroupId: null,
       itemGroupImage: null,
       isCreatingGroup: false,
       newItemGroupName: "",
+      newItemGroupDescription: null,
       propertyWContents: null,
+      canAddField: null,
+      isAddFieldDisabled: true,
+      isFieldAdded: false,
+      listOfProperties: [],
     };
   },
   methods: {
@@ -413,6 +513,86 @@ export default {
         }
       } else {
         // todo
+
+        try {
+          // sending post request for item creation with extra features
+          let itemImages = [];
+
+          for (let index = 0; index < this.images.length; index++) {
+            const element = {
+              image: this.images[index],
+              order: (index + 1).toString(),
+            };
+            itemImages.push(element);
+          }
+
+          const propertyNodes =
+            document.getElementsByClassName("property-name");
+          const contentNodes = document.getElementsByClassName("content-name");
+
+          this.propertyWContents = {};
+          let tempExtraFeatures = [];
+          for (let index = 0; index < propertyNodes.length; index++) {
+            const key = propertyNodes[index].value;
+            const value = contentNodes[index].value;
+            if (value === "") {
+              value = null;
+            }
+            this.propertyWContents[key] = value;
+            tempExtraFeatures.push(key);
+          }
+
+          const payloadForNewItemWExtra = {
+            itemName: this.itemName,
+            itemGroupName: this.selectedItemGroup,
+            itemDescription: this.itemDescription,
+            itemPrice: this.itemPrice,
+            itemQuantity: this.itemQuantity,
+            extraFeatures: this.propertyWContents,
+            isPinned: this.isPinnedFormatted,
+            itemImages: itemImages,
+          };
+
+          if (this.isFieldAdded) {
+            console.log("running");
+            for (let prop of this.listOfProperties) {
+              console.log(prop);
+            }
+            const groupUpdatePayload = {
+              itemGroupId: this.itemGroupId,
+              extraFeatures: this.listOfProperties,
+            };
+            console.log(groupUpdatePayload);
+            let updateItemGroupRes = null;
+            updateItemGroupRes = await fetch(
+              `http://localhost:8080/api/v1/item-ops/item-group`,
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "Bearer " + this.$store.getters["auth/token"], //accessToken contain bearer value.
+                },
+                body: JSON.stringify(groupUpdatePayload),
+              }
+            );
+          }
+          const response = await fetch(
+            `http://localhost:8080/api/v1/item-ops/item/extra`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + this.$store.getters["auth/token"], //accessToken contain bearer value.
+              },
+              body: JSON.stringify(payloadForNewItemWExtra),
+            }
+          );
+          if (response.ok) {
+            alert("Item with extra feature added!");
+          }
+        } catch (error) {
+          throw Error(error);
+        }
       }
     },
     async createItemGroup() {
@@ -424,8 +604,10 @@ export default {
       for (let index = 0; index < propertyNodes.length; index++) {
         const key = propertyNodes[index].value;
         const value = contentNodes[index].value;
-        const contFormattedVal = value.split(",");
-        this.propertyWContents[key] = contFormattedVal;
+        if (value === "") {
+          value = null;
+        }
+        this.propertyWContents[key] = value;
         tempExtraFeatures.push(key);
       }
 
@@ -434,6 +616,10 @@ export default {
         extraFeatures: tempExtraFeatures,
         itemGroupImage: this.itemGroupImage,
       };
+
+      if (this.newItemGroupDescription) {
+        payloadForNewGroup.itemGroupDescription = this.newItemGroupDescription;
+      }
 
       // todo: sending post request for item group creation:
 
@@ -688,17 +874,17 @@ export default {
     },
 
     addPropContentField() {
+      if (this.isAddFieldDisabled) {
+        return;
+      }
       const propertyInput = `<div class="prop-cont-extra-container"><div class="mb-sm"><input
-        required
         type="text"
         id="property-name"
         placeholder="e.g., color, size"
         class="form-input--primary property-name"
       /></div><div class="mb-sm"><input
-                required
                 type="text"
                 id="content-name"
-
                 class="form-input--primary content-name"
                 placeholder="e.g., red, blue, green "/>
                 <span class="prop-content__remove-icon" onclick="myFunction(this.parentElement)">
@@ -708,16 +894,11 @@ export default {
                 </span>
               </div></div>`;
 
-      // const contentInput = `
-      //         `;
       this.$refs["extra-prop-content-field"].insertAdjacentHTML(
         "beforeend",
         propertyInput
       );
-      // this.$refs["extra-prop-content-field"].insertAdjacentHTML(
-      //   "beforeend",
-      //   contentInput
-      // );
+      this.isFieldAdded = true;
     },
   },
 };

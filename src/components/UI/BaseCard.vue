@@ -1,9 +1,15 @@
 <template>
   <teleport to="body">
     <div class="backdrop"></div>
-    <div class="card">
-      <slot></slot></div
-  ></teleport>
+    <div class="card" v-bind="$attrs">
+      <header>
+        <slot name="header"></slot>
+      </header>
+
+      <slot></slot>
+      <slot name="buttons"></slot>
+    </div>
+  </teleport>
 </template>
 
 <style scoped>
@@ -14,7 +20,7 @@
   height: 100%;
   top: 0;
   left: 0;
-  position: absolute;
+  position: fixed;
   z-index: 100;
 }
 
@@ -28,11 +34,21 @@
   top: 10%;
   left: 50%;
   transform: translateX(-50%);
-  position: absolute;
+  position: fixed;
   background-color: white;
   z-index: 101;
   border-radius: var(--card-border-radius);
   box-shadow: var(--shadow-light);
+}
+
+.min-content {
+  width: 30vw;
+  min-height: 40vh;
+  max-height: 610px;
+  top: 15%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
 }
 
 ::-webkit-scrollbar {

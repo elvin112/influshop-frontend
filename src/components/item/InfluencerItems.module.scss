@@ -29,6 +29,39 @@
 
     .item__availability {
     }
+
+    .actions {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      width: 55%;
+      .edit-item {
+        &__icon {
+          width: 1rem;
+          height: 1rem;
+          fill: transparent;
+          stroke: #549ad8;
+          cursor: pointer;
+        }
+      }
+      .seperator {
+        transform: translateY(-10%);
+        height: 1.2rem;
+        width: 0.1rem;
+        background-color: var(--color-grey-light-6);
+      }
+      .delete-item {
+        &__icon {
+          width: 1rem;
+          height: 1rem;
+          fill: transparent;
+          stroke: red;
+          cursor: pointer;
+        }
+      }
+    }
   }
 }
 

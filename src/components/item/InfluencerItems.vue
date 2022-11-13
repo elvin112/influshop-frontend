@@ -1,22 +1,44 @@
 <template>
   <h2 v-if="isLoading">Loading...</h2>
   <div class="wrapper">
+    <ItemDeletionSimplePopup v-if="bringSimpleItemDeletionCard" />
+    <ItemGroupDeletionPopup
+      v-if="bringItemGroupDeletionCard"
+      :extraFeatures="extraFeatures"
+    />
     <div class="introductory">
       <h3 class="introductory__header-title">TYPE</h3>
       <h3 class="introductory__header-title">NAME</h3>
       <h3 class="introductory__header-title">PRICE</h3>
-      <h3 class="introductory__header-title">AVAILABLE</h3>
+      <h3 class="introductory__header-title">AVAILABILITY</h3>
       <h3 class="introductory__header-title">ACTIONS</h3>
     </div>
     <hr />
     <div class="items">
       <ul>
-        <li v-for="item in influencerItems">
+        <li v-for="item in influencerItems" :key="item.id">
           <p>{{ item.type === "item" ? "item" : "item group" }}</p>
           <p>{{ item.name }}</p>
-          <p>{{ item.price }}$</p>
-          <p class="item__availability">{{ item.available }}</p>
-          <p>ACTIONS</p>
+          <p>${{ item.price }}</p>
+          <p class="item__availability">
+            {{ item.available ? "in stock" : "out of stock" }}
+          </p>
+          <div class="actions">
+            <div class="edit-item">
+              <svg class="edit-item__icon">
+                <use xlink:href="../../assets/img/sprite.svg#icon-pencil" />
+              </svg>
+            </div>
+            <span class="seperator"></span>
+            <div
+              class="delete-item"
+              @click="deletePopupHandler(item.id, item.type, item.name)"
+            >
+              <svg class="delete-item__icon">
+                <use xlink:href="../../assets/img/sprite.svg#icon-bin" />
+              </svg>
+            </div>
+          </div>
         </li>
       </ul>
     </div>
@@ -24,10 +46,28 @@
 </template>
 
 <script>
+import ItemDeletionSimplePopup from "./ItemDeletionSimplePopup.vue";
+import ItemGroupDeletionPopup from "./ItemGroupDeletionPopup.vue";
+
 export default {
+  provide() {
+    return {
+      deleteItem: this.deleteSimpleItem,
+      deleteItemGroup: this.deleteItemGroup,
+      closeSimpleDeletionPopup: this.closeSimpleDeletionPopup,
+      closeItemGroupDeletionPopup: this.closeItemGroupDeletionPopup,
+    };
+  },
+  components: { ItemDeletionSimplePopup, ItemGroupDeletionPopup },
   data() {
     return {
       isLoading: false,
+      itemId: null,
+      itemType: null,
+      itemName: null,
+      bringSimpleItemDeletionCard: false,
+      bringItemGroupDeletionCard: false,
+      extraFeatures: [],
     };
   },
   computed: {
@@ -48,6 +88,55 @@ export default {
   methods: {
     fetchItems() {
       this.$store.dispatch("influencer/fetchInfluencerItems");
+    },
+
+    async deletePopupHandler(itemId, itemType, itemName) {
+      this.itemId = itemId;
+      this.itemType = itemType;
+      this.itemName = itemName;
+      if (itemType === "item") {
+        this.bringSimpleItemDeletionCard = true;
+      } else {
+        const response = await fetch(
+          `http://localhost:8080/api/v1/item-ops/item-group/${this.itemId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw Error("Internal server error");
+        } else {
+          const data = await response.json();
+          this.extraFeatures = data.itemGroup.extraFeatures;
+        }
+        this.bringItemGroupDeletionCard = true;
+      }
+    },
+    deleteSimpleItem() {
+      this.$store.dispatch("influencer/deleteItem", {
+        itemId: this.itemId,
+        itemType: this.itemType,
+      });
+      this.bringSimpleItemDeletionCard = false;
+    },
+    deleteItemGroup(queryParams) {
+      this.bringItemGroupDeletionCard = false;
+
+      this.$store.dispatch("influencer/deleteItem", {
+        queryParams: queryParams,
+        itemName: this.itemName,
+        itemType: this.itemType,
+      });
+    },
+    closeSimpleDeletionPopup() {
+      this.bringSimpleItemDeletionCard = false;
+    },
+    closeItemGroupDeletionPopup() {
+      this.bringItemGroupDeletionCard = false;
     },
   },
 };

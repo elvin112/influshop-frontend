@@ -9,7 +9,6 @@ export default {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: payload.username,
           email: payload.email,
           password: payload.password,
         }),
@@ -17,6 +16,7 @@ export default {
     );
 
     const responseData = await response.clone().json();
+    console.log(responseData);
     if (!response.ok) {
       return response.clone();
     }
@@ -32,7 +32,7 @@ export default {
       isInfluencer = false;
     }
 
-    localStorage.setItem("username", payload.username);
+    localStorage.setItem("username", responseData.username);
     localStorage.setItem("email", responseData.email);
     localStorage.setItem("token", responseData.token);
     localStorage.setItem("tokenExpiration", expirationDate);
@@ -43,7 +43,7 @@ export default {
     }, expiresIn);
 
     context.commit("setUser", {
-      username: payload.username,
+      username: responseData.username,
       email: responseData.email,
       token: responseData.token,
       isInfluencer: payload.isInfluencer,

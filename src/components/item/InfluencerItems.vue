@@ -6,6 +6,10 @@
       v-if="bringItemGroupDeletionCard"
       :extraFeatures="extraFeatures"
     />
+    <UpdateSimpleItem
+      v-if="bringFlatItemUpdateCard"
+      :itemToUpdate="itemToUpdate"
+    />
     <div class="introductory">
       <h3 class="introductory__header-title">TYPE</h3>
       <h3 class="introductory__header-title">NAME</h3>
@@ -24,7 +28,7 @@
             {{ item.available ? "in stock" : "out of stock" }}
           </p>
           <div class="actions">
-            <div class="edit-item">
+            <div class="edit-item" @click="updatePopupHandler(item)">
               <svg class="edit-item__icon">
                 <use xlink:href="../../assets/img/sprite.svg#icon-pencil" />
               </svg>
@@ -48,6 +52,7 @@
 <script>
 import ItemDeletionSimplePopup from "./ItemDeletionSimplePopup.vue";
 import ItemGroupDeletionPopup from "./ItemGroupDeletionPopup.vue";
+import UpdateSimpleItem from "./UpdateSimpleItem.vue";
 
 export default {
   provide() {
@@ -58,7 +63,11 @@ export default {
       closeItemGroupDeletionPopup: this.closeItemGroupDeletionPopup,
     };
   },
-  components: { ItemDeletionSimplePopup, ItemGroupDeletionPopup },
+  components: {
+    ItemDeletionSimplePopup,
+    ItemGroupDeletionPopup,
+    UpdateSimpleItem,
+  },
   data() {
     return {
       isLoading: false,
@@ -67,7 +76,9 @@ export default {
       itemName: null,
       bringSimpleItemDeletionCard: false,
       bringItemGroupDeletionCard: false,
+      bringFlatItemUpdateCard: false,
       extraFeatures: [],
+      itemToUpdate: null,
     };
   },
   computed: {
@@ -88,6 +99,11 @@ export default {
   methods: {
     fetchItems() {
       this.$store.dispatch("influencer/fetchInfluencerItems");
+    },
+
+    async updatePopupHandler(item) {
+      this.itemToUpdate = item;
+      this.bringFlatItemUpdateCard = true;
     },
 
     async deletePopupHandler(itemId, itemType, itemName) {

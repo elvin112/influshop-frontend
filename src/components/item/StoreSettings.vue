@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper-store-settings">
-    <div class="your-items-container">
+    <div class="your-items-container" ref="your-items-container">
       <h2 class="your-items-title">Your Items</h2>
 
       <router-link
@@ -21,6 +21,7 @@ import { KeepAlive } from "vue";
 import InfluencerItems from "./InfluencerItems.vue";
 
 export default {
+  mounted() {},
   components: { InfluencerItems },
 };
 </script>

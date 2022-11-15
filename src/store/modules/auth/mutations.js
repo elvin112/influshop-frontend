@@ -1,6 +1,6 @@
 export default {
   setUser(state, payload) {
-    state.username = payload.userId;
+    state.username = payload.username;
     state.email = payload.email;
     state.token = payload.token;
     state.isInfluencer = payload.isInfluencer;

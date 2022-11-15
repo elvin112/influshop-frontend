@@ -103,59 +103,6 @@
     border: none;
     border-top: 2px solid var(--color-grey-light-2);
   }
-  .extra-feature-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr;
-    padding: 0.5rem 0.1rem;
-    .full-width {
-      margin: 0;
-      margin-top: 1rem;
-      width: 100%;
-    }
-    &__group-selection {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-    }
-    select {
-      width: 60%;
-    }
-
-    .input-icon-plus-circle {
-      width: 0.7rem;
-      height: 0.7rem;
-    }
-  }
-  .property-content-container {
-    margin-top: 1rem;
-    display: flex;
-
-    label {
-      font-size: 0.7rem;
-    }
-
-    .property {
-      display: flex;
-      flex-direction: column;
-      width: 40%;
-    }
-
-    .content {
-      display: flex;
-      flex-direction: column;
-      width: 60%;
-      flex: 1 0;
-
-      &__first-content {
-        width: 90%;
-      }
-    }
-    //   input {
-    //     width: 90%;
-    //   }
-    // }
-  }
 
   .disabled {
     cursor: not-allowed;

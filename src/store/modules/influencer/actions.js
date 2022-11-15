@@ -1,7 +1,7 @@
 export default {
   async fetchInfluencerItems(context, payload) {
     const response = await fetch(
-      `http://localhost:8080/api/v1/item-ops/items/testInf1`,
+      `http://localhost:8080/api/v1/item-ops/items/${context.rootState.auth.username}`,
       {
         method: "GET",
         headers: {
@@ -25,7 +25,7 @@ export default {
       endpointUrl = `http://localhost:8080/api/v1/item-ops/item/${payload.itemId}`;
     } else {
       const response = await fetch(
-        `http://localhost:8080/api/v1/item-ops/item/testInf1/${payload.itemName}/extra?${payload.queryParams}`,
+        `http://localhost:8080/api/v1/item-ops/item/${context.rootState.auth.username}/${payload.itemName}/extra?${payload.queryParams}`,
         {
           method: "GET",
           headers: {

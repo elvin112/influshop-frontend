@@ -21,7 +21,7 @@
       </div>
     </template>
     <template #buttons>
-      <div class="form-button-control">
+      <div class="form-button-control-2">
         <button
           class="btn btn--cancel"
           type="submit"
@@ -87,7 +87,7 @@ export default {
   font-weight: 500;
 }
 
-.form-button-control {
+.form-button-control-2 {
   width: 100%;
   display: flex;
   margin-top: 100px;

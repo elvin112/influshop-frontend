@@ -320,7 +320,7 @@
 
         <div class="form-button-control">
           <button class="btn btn--success" type="submit">Save</button>
-          <button class="btn btn--cancel">Cancel</button>
+          <button class="btn btn--cancel" @click="closePopup">Cancel</button>
         </div>
       </form>
     </div>
@@ -554,15 +554,12 @@ export default {
           };
 
           if (this.isFieldAdded) {
-            console.log("running");
             for (let prop of this.listOfProperties) {
-              console.log(prop);
             }
             const groupUpdatePayload = {
               itemGroupId: this.itemGroupId,
               extraFeatures: this.listOfProperties,
             };
-            console.log(groupUpdatePayload);
             let updateItemGroupRes = null;
             updateItemGroupRes = await fetch(
               `http://localhost:8080/api/v1/item-ops/item-group`,
@@ -676,34 +673,35 @@ export default {
           itemImages.push(element);
         }
         try {
-          const response = await fetch(
-            `http://localhost:8080/api/v1/item-ops/item`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + this.$store.getters["auth/token"], //accessToken contain bearer value.
-              },
-              body: JSON.stringify({
-                itemName: this.itemName,
-                itemDescription: this.itemDescription,
-                itemPrice: this.itemPrice,
-                itemQuantity: this.itemQuantity,
-                isPinned: this.isPinnedFormatted,
-                itemImages: itemImages,
-              }),
-            }
+          const actionPayload = {
+            itemName: this.itemName,
+            itemDescription: this.itemDescription,
+            itemPrice: this.itemPrice,
+            itemQuantity: this.itemQuantity,
+            isPinned: this.isPinnedFormatted,
+            itemImages: itemImages,
+          };
+          console.log("running in submitHandler...");
+
+          const response = await this.$store.dispatch(
+            "influencer/addItem",
+            actionPayload
           );
 
           if (!response.ok) {
             throw Error("Internal server error");
           } else {
             alert("Item added!");
+            this.closePopup();
           }
         } catch (error) {
           this.errorMsg = error.message;
         }
       }
+    },
+
+    closePopup() {
+      this.$router.replace("/userSettings/settings/store");
     },
 
     preview(event, msg) {

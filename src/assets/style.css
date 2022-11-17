@@ -102,8 +102,19 @@ h6 {
   grid-template-columns: 40% 1fr;
 }
 
-.extra-prop-content-field input {
-  width: 60%;
+.update-prop-cont-extra-container {
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+
+.update-prop-cont-container {
+  display: grid;
+  grid-template-columns: 90% 90%;
+  grid-gap: 2rem;
+}
+
+.update-prop-cont-container input {
+  width: 100%;
 }
 
 .btn--tertiary {

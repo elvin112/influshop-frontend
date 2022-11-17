@@ -10,6 +10,11 @@
       v-if="bringFlatItemUpdateCard"
       :itemToUpdate="itemToUpdate"
     />
+    <UpdateItemWFeature
+      v-if="bringItemWFeatureUpdateCard"
+      :itemToUpdate="itemToUpdate"
+      :extraFeatures="extraFeatures"
+    />
     <div class="introductory">
       <h3 class="introductory__header-title">TYPE</h3>
       <h3 class="introductory__header-title">NAME</h3>
@@ -52,6 +57,7 @@
 <script>
 import ItemDeletionSimplePopup from "./ItemDeletionSimplePopup.vue";
 import ItemGroupDeletionPopup from "./ItemGroupDeletionPopup.vue";
+import UpdateItemWFeature from "./UpdateItemWFeature.vue";
 import UpdateSimpleItem from "./UpdateSimpleItem.vue";
 
 export default {
@@ -61,12 +67,15 @@ export default {
       deleteItemGroup: this.deleteItemGroup,
       closeSimpleDeletionPopup: this.closeSimpleDeletionPopup,
       closeItemGroupDeletionPopup: this.closeItemGroupDeletionPopup,
+      closeUpdateFlatItemPopup: this.closeUpdateFlatItemPopup,
+      closeUpdateItemWFeaturePopup: this.closeUpdateItemWFeaturePopup,
     };
   },
   components: {
     ItemDeletionSimplePopup,
     ItemGroupDeletionPopup,
     UpdateSimpleItem,
+    UpdateItemWFeature,
   },
   data() {
     return {
@@ -77,6 +86,7 @@ export default {
       bringSimpleItemDeletionCard: false,
       bringItemGroupDeletionCard: false,
       bringFlatItemUpdateCard: false,
+      bringItemWFeatureUpdateCard: false,
       extraFeatures: [],
       itemToUpdate: null,
     };
@@ -103,7 +113,31 @@ export default {
 
     async updatePopupHandler(item) {
       this.itemToUpdate = item;
-      this.bringFlatItemUpdateCard = true;
+      this.itemId = item.id;
+      this.itemType = item.type;
+      this.itemName = item.name;
+      if (item.type === "item") {
+        this.bringFlatItemUpdateCard = true;
+      } else if (item.type === "itemGroup") {
+        const response = await fetch(
+          `http://localhost:8080/api/v1/item-ops/item-group/${this.itemId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw Error("Internal server error");
+        } else {
+          const data = await response.json();
+          this.extraFeatures = data.itemGroup.extraFeatures;
+        }
+
+        this.bringItemWFeatureUpdateCard = true;
+      }
     },
 
     async deletePopupHandler(itemId, itemType, itemName) {
@@ -153,6 +187,14 @@ export default {
     },
     closeItemGroupDeletionPopup() {
       this.bringItemGroupDeletionCard = false;
+    },
+    closeUpdateFlatItemPopup() {
+      this.bringFlatItemUpdateCard = false;
+      this.fetchItems();
+    },
+    closeUpdateItemWFeaturePopup() {
+      this.bringItemWFeatureUpdateCard = false;
+      this.fetchItems();
     },
   },
 };

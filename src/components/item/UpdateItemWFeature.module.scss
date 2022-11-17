@@ -1,0 +1,132 @@
+.wrapper-add-item {
+  padding: 1rem;
+
+  .btn-update--find {
+    width: fit-content;
+    margin-left: 32rem;
+  }
+
+  .property-content-container {
+    display: grid;
+    grid-template-columns: 50% 50%;
+
+    .property-name {
+      display: block;
+      width: 90%;
+    }
+
+    .content-name {
+      display: block;
+      width: 90%;
+    }
+  }
+
+  .title {
+    font-family: "Montserrat", sans-serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    display: block;
+    text-align: center;
+  }
+}
+
+.add-item-form {
+  margin: 1.4rem 0;
+  display: flex;
+  flex-direction: column;
+
+  &__form-control {
+    width: 95%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    &:not(:last-child) {
+      margin-bottom: 2rem;
+    }
+    input {
+      width: 60%;
+    }
+
+    .radio-item {
+      width: 10%;
+    }
+  }
+
+  label,
+  p {
+    font-family: "Montserrat", sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  .form-button-control {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+
+    .btn {
+      padding: 0.53rem 1.47rem;
+      width: 100%;
+      &:not(last-child) {
+        margin-right: 1rem;
+      }
+    }
+  }
+
+  .file-placeholder {
+    .image-uploader {
+      &:not(:last-child) {
+        margin-right: 1rem;
+      }
+      display: flex;
+      border: 1px dashed black;
+      border-radius: 8px;
+      width: 135px;
+      height: 135px;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+
+      label {
+        font-size: 0.8rem;
+        font-weight: 400;
+        text-align: center;
+        margin: 0;
+      }
+
+      input {
+        display: none;
+      }
+
+      img {
+        display: none;
+        padding: 0.1rem;
+        width: 120px;
+        height: 120px;
+      }
+
+      &__delete-item {
+        position: absolute;
+
+        top: 0.4rem;
+        right: 0.5rem;
+        cursor: pointer;
+      }
+    }
+  }
+
+  hr {
+    width: 95%;
+    height: 15px;
+    border: none;
+    border-top: 2px solid var(--color-grey-light-2);
+  }
+
+  .disabled {
+    cursor: not-allowed;
+    background-color: rgb(229, 229, 229) !important;
+    box-shadow: none;
+  }
+}

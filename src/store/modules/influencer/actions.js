@@ -18,6 +18,20 @@ export default {
     }
   },
 
+  async addItem(context, payload) {
+    const response = await fetch(`http://localhost:8080/api/v1/item-ops/item`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + context.rootState.auth.token, //accessToken contain bearer value.
+      },
+      body: JSON.stringify(payload),
+    });
+    console.log("running in actions...");
+    context.dispatch("fetchInfluencerItems");
+    return response;
+  },
+
   async deleteItem(context, payload) {
     let endpointUrl = null;
 

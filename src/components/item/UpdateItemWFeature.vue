@@ -1,9 +1,40 @@
 <template>
   <BaseCard>
     <div class="wrapper-add-item">
-      <h2 class="title">Updating Flat Item</h2>
+      <h2 class="title">Updating Item W Feature</h2>
 
       <form action="" class="add-item-form" @submit.prevent="submitHandler">
+        <h2 class="header__title">Select item's features to delete</h2>
+        <br />
+        <div
+          class="item-group-container"
+          v-for="property in this.extraFeatureProperties"
+        >
+          <div class="item-group-container__prop">
+            <p class="prop-par">{{ property }}</p>
+          </div>
+
+          <div class="item-group-container__content">
+            <select name="" id="" class="form-input--primary" required>
+              <option v-for="elem in this.extraFeatures[property]">
+                {{ elem }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="add-item-form__form-control">
+          <button
+            type="button"
+            class="btn btn--tertiary btn-update--find"
+            @click="fetchItemWExtra"
+          >
+            Find
+          </button>
+        </div>
+
+        <!-- **************************************************************************** -->
+        <hr />
         <div class="add-item-form__form-control">
           <label for="item-name">Name:</label>
           <input
@@ -42,28 +73,6 @@
             id="item-quantity"
             v-model="itemQuantity"
             class="form-input--primary"
-          />
-        </div>
-        <div class="add-item-form__form-control">
-          <p>Pin this item?</p>
-          <label for="pin-item">Yes</label>
-          <input
-            type="radio"
-            id="pin-item"
-            name="pin-this-item"
-            v-model="isPinned"
-            value="yes"
-            class="form-input--primary radio-item"
-          />
-
-          <label for="dont-pin-item">No</label>
-          <input
-            type="radio"
-            id="dont-pin-item"
-            name="pin-this-item"
-            v-model="isPinned"
-            value="no"
-            class="form-input--primary radio-item"
           />
         </div>
 
@@ -163,6 +172,7 @@
             </label>
 
             <img ref="frame5" src="" alt="" class="image-uploader__preview" />
+
             <span
               class="image-uploader__delete-item"
               @click="deleteImg('image-5')"
@@ -174,9 +184,43 @@
           </div>
         </div>
 
+        <div class="full-width">
+          <div class="property-content-container">
+            <div class="property">
+              <label for="property-name">Property:</label>
+              <input
+                type="text"
+                id="property-name"
+                placeholder="e.g., color, size"
+                class="form-input--primary mb-sm property-name"
+                ref="property-name-first-row"
+                disabled
+              />
+            </div>
+            <div class="content">
+              <label for="content-name">Content:</label>
+              <input
+                type="text"
+                id="content-name"
+                class="form-input--primary mb-sm content-name"
+                placeholder="e.g., red, blue, green"
+                ref="content-name-first-row"
+              />
+            </div>
+          </div>
+
+          <div
+            class="update-prop-cont-extra-container"
+            ref="extra-prop-content-field"
+          ></div>
+        </div>
+
         <div class="form-button-control">
           <button class="btn btn--success" type="submit">Save</button>
-          <button class="btn btn--cancel" @click="closeUpdateFlatItemPopup()">
+          <button
+            class="btn btn--cancel"
+            @click="closeUpdateItemWFeaturePopup()"
+          >
             Cancel
           </button>
         </div>
@@ -193,56 +237,149 @@ var cl = new Cloudinary({
   secure: true,
 });
 export default {
-  props: ["itemToUpdate"],
-  inject: ["closeUpdateFlatItemPopup"],
+  props: ["itemToUpdate", "extraFeatures"],
+  inject: ["closeUpdateItemWFeaturePopup"],
+
   mounted() {
-    this.itemName = this.itemToUpdate.name;
-    this.itemDescription = this.itemToUpdate.description;
-    this.itemPrice = this.itemToUpdate.price;
-    this.isPinned = this.itemToUpdate.isPinned ? "yes" : "no";
-    this.itemId = this.itemToUpdate.id;
-    this.fetchItemImages();
+    this.itemGroupName = this.itemToUpdate.name;
+    this.itemGroupId = this.itemToUpdate.id;
+
+    for (const property in this.extraFeatures) {
+      this.extraFeatureProperties.push(property);
+    }
+    // this.fetchItemImages();
   },
-  watch: {
-    isPinned(value) {
-      if (value === "no") {
-        this.isPinnedFormatted = false;
-      } else {
-        this.isPinnedFormatted = true;
-      }
-    },
-  },
+
   data() {
     return {
-      isPinnedFormatted: false,
+      itemGroupName: "",
+      itemGroupId: "",
       images: [],
       itemName: "",
       itemDescription: "",
       itemPrice: "",
       itemQuantity: "",
-      isPinned: "no",
       isInternalError: false,
       errorMsg: "",
       itemId: null,
       itemImages: [],
+      itemImagesForPayload: [],
       image1Loaded: false,
       image2Loaded: false,
       image3Loaded: false,
       image4Loaded: false,
       image5Loaded: false,
+      extraFeatureProperties: [],
+      listOfProperties: [],
+      propertyWContents: {},
     };
   },
   methods: {
+    async fetchItemWExtra() {
+      const propertyNodes = document.getElementsByClassName("prop-par");
+      const contentNodes = document.getElementsByClassName(
+        "form-input--primary"
+      );
+
+      let queryParams = "";
+      for (let index = 0; index < propertyNodes.length; index++) {
+        if (index !== 0) {
+          queryParams += "&";
+        }
+        const prop = propertyNodes[index].innerHTML;
+        const cont = contentNodes[index].value;
+        queryParams += `${prop}=${cont}`;
+      }
+      // localhost:8080/api/v1/item-ops/item/1004/myNewItemGroup11/extra?Color=Black&Size=L
+
+      const response = await fetch(
+        `http://localhost:8080/api/v1/item-ops/item/${this.$store.getters["auth/username"]}/${this.itemGroupName}/extra?${queryParams}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw Error("Internal server error");
+      } else {
+        const data = await response.json();
+
+        const item = toRaw(data.item);
+        this.itemId = item.id;
+        this.itemName = item.name;
+        this.itemDescription = item.description;
+        this.itemPrice = item.price;
+        this.itemImages = item.images;
+        this.loadItemImages();
+        const firstPropEl = this.$refs["property-name-first-row"];
+        const firstContentEl = this.$refs["content-name-first-row"];
+
+        this.listOfProperties = [];
+        let itemGroupExtraFeatures = item.extraFeatures;
+        for (const property in itemGroupExtraFeatures) {
+          this.listOfProperties.push(property);
+        }
+        for (let index = 0; index < this.listOfProperties.length; index++) {
+          if (index === 0) {
+            // add value parameter to property of only first row
+            firstPropEl.value = this.listOfProperties[index];
+            firstContentEl.value =
+              itemGroupExtraFeatures[this.listOfProperties[index]];
+            firstPropEl.disabled = true;
+          } else {
+            const propertyInput = `<div class="update-prop-cont-container"><div class="mb-sm"><input
+        type="text"
+        id="property-name"
+        placeholder="e.g., color, size"
+        class="form-input--primary property-name"
+        value=${this.listOfProperties[index]}
+        disabled
+      /></div><div class="mb-sm"><input
+
+                type="text"
+                id="content-name"
+                class="form-input--primary content-name"
+                placeholder="e.g., red, blue, green"
+                value=${itemGroupExtraFeatures[this.listOfProperties[index]]}
+                />
+           
+              </div></div>`;
+
+            this.$refs["extra-prop-content-field"].insertAdjacentHTML(
+              "beforeend",
+              propertyInput
+            );
+          }
+        }
+      }
+    },
     async submitHandler() {
+      const propertyNodes = document.getElementsByClassName("property-name");
+      const contentNodes = document.getElementsByClassName("content-name");
+
+      this.propertyWContents = {};
+      let tempExtraFeatures = {};
+      for (let index = 0; index < propertyNodes.length; index++) {
+        const key = propertyNodes[index].value;
+        const value = contentNodes[index].value;
+        if (value === "") {
+          value = null;
+        }
+        this.propertyWContents[key] = value;
+        tempExtraFeatures[key] = value;
+      }
       let tempImages = [];
-      for (let image of this.itemImages) {
+      for (let image of this.itemImagesForPayload) {
         const rawObjectOrArray = toRaw(image);
         tempImages.push(rawObjectOrArray);
       }
 
       const payload = {
         itemId: this.itemId,
-        isPinned: this.isPinnedFormatted,
+        extraFeatures: tempExtraFeatures,
         itemImages: tempImages,
         itemName: this.itemName,
         itemDescription: this.itemDescription,
@@ -251,6 +388,7 @@ export default {
       };
 
       console.log(payload);
+
       const response = await fetch(
         `http://localhost:8080/api/v1/item-ops/item`,
         {
@@ -267,90 +405,71 @@ export default {
         alert("Something went wrong!");
       } else {
         alert("Item updated!");
-        this.closeUpdateFlatItemPopup();
+        this.closeUpdateItemWFeaturePopup();
       }
     },
-    async fetchItemImages() {
-      const response = await fetch(
-        `http://localhost:8080/api/v1/item-ops/item/${this.itemId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    async loadItemImages() {
+      const tempImages = this.itemImages;
 
-      if (!response.ok) {
-        if (response.status === 404) {
-          alert("Item not found!");
-          return;
-        }
-        // throw Error("Internal server error");
-      } else {
-        const data = await response.json();
-        const tempImages = data.item.images;
+      for (let elem of tempImages) {
+        this.itemImagesForPayload.push({
+          image: elem.imageLocation,
+          order: elem.imageOrder + "",
+          isNew: false,
+        });
+        switch (elem.imageOrder + "") {
+          case "1":
+            const frame1 = this.$refs.frame1;
+            const fileLabel1 = this.$refs.fileLabel1;
+            // frame1.src = URL.createObjectURL(event.target.files[0]);
+            frame1.style.display = "inline-block";
+            fileLabel1.style.display = "none";
+            frame1.src = cl.image(elem.imageLocation).src;
+            this.image1Loaded = true;
+            break;
+          case "2":
+            const frame2 = this.$refs.frame2;
+            const fileLabel2 = this.$refs.fileLabel2;
+            // frame2.src = URL.createObjectURL(event.target.files[0]);
+            frame2.style.display = "inline-block";
+            fileLabel2.style.display = "none";
+            frame2.src = cl.image(elem.imageLocation).src;
+            this.image2Loaded = true;
 
-        for (let elem of tempImages) {
-          this.itemImages.push({
-            image: elem.imageLocation,
-            order: elem.imageOrder + "",
-            isNew: false,
-          });
-          switch (elem.imageOrder + "") {
-            case "1":
-              const frame1 = this.$refs.frame1;
-              const fileLabel1 = this.$refs.fileLabel1;
-              // frame1.src = URL.createObjectURL(event.target.files[0]);
-              frame1.style.display = "inline-block";
-              fileLabel1.style.display = "none";
-              frame1.src = cl.image(elem.imageLocation).src;
-              this.image1Loaded = true;
-              break;
-            case "2":
-              const frame2 = this.$refs.frame2;
-              const fileLabel2 = this.$refs.fileLabel2;
-              // frame2.src = URL.createObjectURL(event.target.files[0]);
-              frame2.style.display = "inline-block";
-              fileLabel2.style.display = "none";
-              frame2.src = cl.image(elem.imageLocation).src;
-              this.image2Loaded = true;
+            break;
+          case "3":
+            const frame3 = this.$refs.frame3;
+            const fileLabel3 = this.$refs.fileLabel3;
+            // frame3.src = URL.createObjectURL(event.target.files[0]);
+            frame3.style.display = "inline-block";
+            fileLabel3.style.display = "none";
+            frame3.src = cl.image(elem.imageLocation).src;
+            this.image3Loaded = true;
 
-              break;
-            case "3":
-              const frame3 = this.$refs.frame3;
-              const fileLabel3 = this.$refs.fileLabel3;
-              // frame3.src = URL.createObjectURL(event.target.files[0]);
-              frame3.style.display = "inline-block";
-              fileLabel3.style.display = "none";
-              frame3.src = cl.image(elem.imageLocation).src;
-              this.image3Loaded = true;
+            break;
+          case "4":
+            const frame4 = this.$refs.frame4;
+            const fileLabel4 = this.$refs.fileLabel4;
+            // frame4.src = URL.createObjectURL(event.target.files[0]);
+            frame4.style.display = "inline-block";
+            fileLabel4.style.display = "none";
+            frame4.src = cl.image(elem.imageLocation).src;
+            this.image4Loaded = true;
 
-              break;
-            case "4":
-              const frame4 = this.$refs.frame4;
-              const fileLabel4 = this.$refs.fileLabel4;
-              // frame4.src = URL.createObjectURL(event.target.files[0]);
-              frame4.style.display = "inline-block";
-              fileLabel4.style.display = "none";
-              frame4.src = cl.image(elem.imageLocation).src;
-              this.image4Loaded = true;
+            break;
+          case "5":
+            const frame5 = this.$refs.frame5;
+            const fileLabel5 = this.$refs.fileLabel5;
+            // frame5.src = URL.createObjectURL(event.target.files[0]);
+            frame5.style.display = "inline-block";
+            fileLabel5.style.display = "none";
+            frame5.src = cl.image(elem.imageLocation).src;
+            this.image5Loaded = true;
 
-              break;
-            case "5":
-              const frame5 = this.$refs.frame5;
-              const fileLabel5 = this.$refs.fileLabel5;
-              // frame5.src = URL.createObjectURL(event.target.files[0]);
-              frame5.style.display = "inline-block";
-              fileLabel5.style.display = "none";
-              frame5.src = cl.image(elem.imageLocation).src;
-              this.image5Loaded = true;
+            break;
 
-              break;
-
-            default:
-              console.log(`Sorry, we are out of ${expr}.`);
-          }
+          default:
+            console.log(`Sorry, we are out of ${expr}.`);
         }
       }
     },
@@ -377,18 +496,22 @@ export default {
             this.images.push(reader.result);
             frame1.src = reader.result;
             if (!this.image1Loaded) {
-              this.itemImages.push({
+              this.itemImagesForPayload.push({
                 image: reader.result,
                 order: "1",
                 isNew: true,
               });
               this.image1Loaded = true;
             } else {
-              for (let index = 0; index < this.itemImages.length; index++) {
-                const element = this.itemImages[index];
+              for (
+                let index = 0;
+                index < this.itemImagesForPayload.length;
+                index++
+              ) {
+                const element = this.itemImagesForPayload[index];
                 if (element.order === "1") {
-                  this.itemImages[index].image = reader.result;
-                  this.itemImages[index].isNew = true;
+                  this.itemImagesForPayload[index].image = reader.result;
+                  this.itemImagesForPayload[index].isNew = true;
                 }
                 return;
               }
@@ -410,18 +533,22 @@ export default {
             this.images.push(reader.result);
             frame2.src = reader.result;
             if (!this.image2Loaded) {
-              this.itemImages.push({
+              this.itemImagesForPayload.push({
                 image: reader.result,
                 order: "2",
                 isNew: true,
               });
               this.image2Loaded = true;
             } else {
-              for (let index = 0; index < this.itemImages.length; index++) {
-                const element = this.itemImages[index];
+              for (
+                let index = 0;
+                index < this.itemImagesForPayload.length;
+                index++
+              ) {
+                const element = this.itemImagesForPayload[index];
                 if (element.order === "2") {
-                  this.itemImages[index].image = reader.result;
-                  this.itemImages[index].isNew = true;
+                  this.itemImagesForPayload[index].image = reader.result;
+                  this.itemImagesForPayload[index].isNew = true;
                 }
                 return;
               }
@@ -432,7 +559,7 @@ export default {
         case "frame-3":
           const frame3 = this.$refs.frame3;
           const fileLabel3 = this.$refs.fileLabel3;
-          frame3.src = URL.createObjectURL(event.target.files[0]);
+          // frame3.src = URL.createObjectURL(event.target.files[0]);
           frame3.style.display = "inline-block";
           fileLabel3.style.display = "none";
 
@@ -443,18 +570,22 @@ export default {
             this.images.push(reader.result);
             frame3.src = reader.result;
             if (!this.image3Loaded) {
-              this.itemImages.push({
+              this.itemImagesForPayload.push({
                 image: reader.result,
                 order: "3",
                 isNew: true,
               });
               this.image3Loaded = true;
             } else {
-              for (let index = 0; index < this.itemImages.length; index++) {
-                const element = this.itemImages[index];
+              for (
+                let index = 0;
+                index < this.itemImagesForPayload.length;
+                index++
+              ) {
+                const element = this.itemImagesForPayload[index];
                 if (element.order === "3") {
-                  this.itemImages[index].image = reader.result;
-                  this.itemImages[index].isNew = true;
+                  this.itemImagesForPayload[index].image = reader.result;
+                  this.itemImagesForPayload[index].isNew = true;
                 }
                 return;
               }
@@ -476,18 +607,22 @@ export default {
             this.images.push(reader.result);
             frame4.src = reader.result;
             if (!this.image4Loaded) {
-              this.itemImages.push({
+              this.itemImagesForPayload.push({
                 image: reader.result,
                 order: "4",
                 isNew: true,
               });
               this.image4Loaded = true;
             } else {
-              for (let index = 0; index < this.itemImages.length; index++) {
-                const element = this.itemImages[index];
+              for (
+                let index = 0;
+                index < this.itemImagesForPayload.length;
+                index++
+              ) {
+                const element = this.itemImagesForPayload[index];
                 if (element.order === "4") {
-                  this.itemImages[index].image = reader.result;
-                  this.itemImages[index].isNew = true;
+                  this.itemImagesForPayload[index].image = reader.result;
+                  this.itemImagesForPayload[index].isNew = true;
                 }
                 return;
               }
@@ -509,18 +644,22 @@ export default {
             this.images.push(reader.result);
             frame5.src = reader.result;
             if (!this.image5Loaded) {
-              this.itemImages.push({
+              this.itemImagesForPayload.push({
                 image: reader.result,
                 order: "5",
                 isNew: true,
               });
               this.image5Loaded = true;
             } else {
-              for (let index = 0; index < this.itemImages.length; index++) {
-                const element = this.itemImages[index];
+              for (
+                let index = 0;
+                index < this.itemImagesForPayload.length;
+                index++
+              ) {
+                const element = this.itemImagesForPayload[index];
                 if (element.order === "5") {
-                  this.itemImages[index].image = reader.result;
-                  this.itemImages[index].isNew = true;
+                  this.itemImagesForPayload[index].image = reader.result;
+                  this.itemImagesForPayload[index].isNew = true;
                 }
                 return;
               }
@@ -544,10 +683,14 @@ export default {
           frame1.style.display = "none";
           fileLabel1.style.display = "inline-block";
 
-          for (let index = 0; index < this.itemImages.length; index++) {
-            const element = this.itemImages[index];
+          for (
+            let index = 0;
+            index < this.itemImagesForPayload.length;
+            index++
+          ) {
+            const element = this.itemImagesForPayload[index];
             if (element.order === "1") {
-              this.itemImages = this.itemImages.filter(
+              this.itemImagesForPayload = this.itemImagesForPayload.filter(
                 (elem) => elem.order !== "1"
               );
             }
@@ -564,10 +707,14 @@ export default {
           frame2.style.display = "none";
           fileLabel2.style.display = "inline-block";
 
-          for (let index = 0; index < this.itemImages.length; index++) {
-            const element = this.itemImages[index];
+          for (
+            let index = 0;
+            index < this.itemImagesForPayload.length;
+            index++
+          ) {
+            const element = this.itemImagesForPayload[index];
             if (element.order === "2") {
-              this.itemImages = this.itemImages.filter(
+              this.itemImagesForPayload = this.itemImagesForPayload.filter(
                 (elem) => elem.order !== "2"
               );
             }
@@ -583,10 +730,14 @@ export default {
           frame3.style.display = "none";
           fileLabel3.style.display = "inline-block";
 
-          for (let index = 0; index < this.itemImages.length; index++) {
-            const element = this.itemImages[index];
+          for (
+            let index = 0;
+            index < this.itemImagesForPayload.length;
+            index++
+          ) {
+            const element = this.itemImagesForPayload[index];
             if (element.order === "3") {
-              this.itemImages = this.itemImages.filter(
+              this.itemImagesForPayload = this.itemImagesForPayload.filter(
                 (elem) => elem.order !== "3"
               );
             }
@@ -602,10 +753,14 @@ export default {
           frame4.style.display = "none";
           fileLabel4.style.display = "inline-block";
 
-          for (let index = 0; index < this.itemImages.length; index++) {
-            const element = this.itemImages[index];
+          for (
+            let index = 0;
+            index < this.itemImagesForPayload.length;
+            index++
+          ) {
+            const element = this.itemImagesForPayload[index];
             if (element.order === "4") {
-              this.itemImages = this.itemImages.filter(
+              this.itemImagesForPayload = this.itemImagesForPayload.filter(
                 (elem) => elem.order !== "4"
               );
             }
@@ -622,10 +777,14 @@ export default {
           frame5.style.display = "none";
           fileLabel5.style.display = "inline-block";
 
-          for (let index = 0; index < this.itemImages.length; index++) {
-            const element = this.itemImages[index];
+          for (
+            let index = 0;
+            index < this.itemImagesForPayload.length;
+            index++
+          ) {
+            const element = this.itemImagesForPayload[index];
             if (element.order === "5") {
-              this.itemImages = this.itemImages.filter(
+              this.itemImagesForPayload = this.itemImagesForPayload.filter(
                 (elem) => elem.order !== "5"
               );
             }
@@ -642,5 +801,5 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "./UpdateFlatItem.module.scss";
+@import "./UpdateItemWFeature.module.scss";
 </style>

@@ -27,13 +27,13 @@ export default {
 <style>
 .header__title {
   font-family: "Montserrat", sans-serif;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 800;
 }
 
 .header__par {
   font-family: "Montserrat", sans-serif;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 500;
 }
 

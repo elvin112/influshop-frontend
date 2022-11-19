@@ -1,0 +1,176 @@
+.wrapper {
+  padding: var(--content-padding);
+  display: grid;
+  grid-template-columns: 22rem 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2rem;
+  // width: 92%;
+  background-color: var(--color-grey-light-2);
+
+  .image-viewer {
+    width: 100%;
+
+    .main-img-container {
+      width: 22rem;
+      height: 22rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .main-img {
+        max-width: 22rem;
+        max-height: 22rem;
+        background-size: cover;
+        border: 1px solid var(--color-grey-light-6);
+        border-radius: 7px;
+      }
+    }
+
+    .thumb-images {
+      padding-top: 0.4rem;
+      display: flex;
+      justify-content: space-evenly;
+      &__item {
+        width: 50px;
+        height: 50px;
+        background-size: cover;
+        border: 2px solid var(--color-grey-light-6);
+        border-radius: 7px;
+        cursor: pointer;
+      }
+      &__item.active {
+        border: 2px solid var(--color-primary);
+      }
+    }
+  }
+
+  .item-properties {
+    position: relative;
+
+    .warn-sign {
+      position: absolute;
+      top: 1rem;
+      right: 0;
+      &__icon {
+        width: 2.2rem;
+        height: 2.2rem;
+        fill: red;
+        stroke: #ffffff;
+        cursor: pointer;
+      }
+    }
+    &__title {
+      font-family: "Montserrat", sans-serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      // color: var(--color-grey-dark-1);
+      color: var(--color-grey-dark-2);
+      // color: black;
+
+      span {
+        .star-sign__icon {
+          width: 1.8rem;
+          height: 1.8rem;
+          fill: #fabf35;
+          margin-right: 0.5rem;
+          // stroke: #ffffff;
+        }
+      }
+    }
+
+    &__description {
+      width: 100%;
+      font-family: "Montserrat", sans-serif;
+      font-size: 0.88rem;
+
+      color: var(--color-grey-dark-2);
+      overflow: auto;
+      min-height: 9rem;
+      max-height: 9rem;
+      white-space: pre-wrap;
+    }
+
+    .order-specification {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      // align-items: flex-end;
+      .quantityWprice {
+        width: 7rem;
+
+        &__quantity {
+          text-align: center;
+          display: grid;
+          grid-template-columns: 30% 40% 30%;
+          border: 1.4px solid black;
+          border-radius: 15px;
+
+          span {
+            display: inline-block;
+            width: 100%;
+            font-family: "Montserrat", sans-serif;
+          }
+          &--1 {
+            border-right: 1.4px solid black;
+            cursor: pointer;
+          }
+          &--3 {
+            border-left: 1.4px solid black;
+            cursor: pointer;
+          }
+        }
+
+        &__price {
+          .price-text {
+            text-align: center;
+            font-family: "Montserrat", sans-serif;
+            font-size: 1.53rem;
+            color: var(--color-grey-dark-2);
+          }
+        }
+      }
+
+      &__buttons {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        .btn {
+          width: 9.4rem;
+          height: 2.5rem;
+        }
+      }
+    }
+  }
+
+  hr {
+    width: 100%;
+    height: 15px;
+    border: none;
+    border-top: 2px solid var(--color-grey-light-6);
+  }
+
+  span:not(:last-child) {
+    margin-right: 1rem;
+  }
+
+  .reviews {
+    .reviews-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 1.38rem;
+    }
+  }
+
+  ::-webkit-scrollbar {
+    height: 12px;
+    width: 3px;
+    background: rgb(255, 255, 255);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #ccccc6;
+    -webkit-border-radius: 1ex;
+    -webkit-box-shadow: 0px 1px 2px rgba(65, 63, 63, 0.75);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: #000;
+  }
+}

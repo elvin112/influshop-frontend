@@ -7,13 +7,14 @@
   --color-grey-light-2: #f1f1f1;
   --color-grey-light-3: #ecdcdc;
   --color-grey-light-4: #717b8c;
-  --color-grey-light-5: #4c535f;
+  --color-grey-light-5: rgb(76, 83, 95);
   --color-grey-light-6: #e0e4ec;
 
   --color-success: #4bb543;
   --color-success-hover: #45a53e;
 
   --color-grey-dark-1: #070505ab;
+  --color-grey-dark-2: rgb(38, 37, 37);
 
   --card-border-radius-1: 17px;
 
@@ -31,6 +32,14 @@
   margin-bottom: 1rem;
 }
 
+.mt-sm {
+  margin-top: 1rem;
+}
+
+.mt-md {
+  margin-top: 2rem;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -44,7 +53,8 @@
 
 html {
   box-sizing: border-box;
-  font-size: 112.5%; /* This equals to 18px */
+  /* font-size: 112.5%; This equals to 18px */
+  font-size: 101.25%; /* This equals to 16.2px */
 }
 
 body {
@@ -63,20 +73,6 @@ h6 {
   font-size: 1rem;
 }
 
-.btn {
-  border: 0;
-  border-radius: 17px;
-  font-size: 0.9rem;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-family: "Montserrat", sans-serif;
-  font-weight: 800;
-  padding: 0.83rem 1.77rem;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-
 .content input {
   width: 90%;
 }
@@ -89,12 +85,6 @@ h6 {
   width: 1rem;
   height: 1rem;
   fill: #e20000;
-}
-.btn--primary {
-  color: var(--color-grey-light-1);
-  background-color: var(--color-primary);
-  font-weight: 600;
-  box-shadow: 1px 1px 3px var(--color-primary);
 }
 
 .prop-cont-extra-container {
@@ -117,18 +107,47 @@ h6 {
   width: 100%;
 }
 
+.btn {
+  border: 0;
+  border-radius: 17px;
+  font-size: 0.9rem;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  padding: 0.83rem 1.77rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn--primary {
+  color: var(--color-grey-light-1);
+  background-color: var(--color-primary);
+  box-shadow: 1px 1px 3px var(--color-primary);
+}
+
 .btn--tertiary {
   color: var(--color-grey-light-5);
   background-color: yellow;
-  font-weight: 600;
   box-shadow: 1px 1px 3px yellow;
-  font-size: 0.7rem;
   padding: 0.01rem 1.05rem;
   width: auto;
   height: 2rem;
   cursor: pointer;
   display: block;
   /* border-radius: 0; */
+}
+
+.btn--outline {
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  background-color: transparent;
+}
+.btn--outline:hover {
+  color: white;
+  border: 1px solid var(--color-primary);
+  background-color: var(--color-primary);
 }
 
 .btn--tertiary:hover {

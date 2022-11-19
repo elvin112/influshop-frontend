@@ -6,6 +6,7 @@ import UserSettings from "../pages/UserSettings.vue";
 import Settings from "../components/settings/Settings.vue";
 import AddItem from "../components/item/AddItem.vue";
 import StoreSettings from "../components/item/StoreSettings.vue";
+import ItemDetail from "../pages/ItemDetail.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +51,11 @@ const router = createRouter({
           ],
         },
       ],
+    },
+    {
+      path: "/itemDetail/:itemId",
+      name: "itemDetail",
+      component: ItemDetail,
     },
   ],
   linkActiveClass: "active",

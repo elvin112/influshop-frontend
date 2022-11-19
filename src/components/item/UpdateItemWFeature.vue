@@ -405,6 +405,7 @@ export default {
         alert("Something went wrong!");
       } else {
         alert("Item updated!");
+        console.log(await response.json());
         this.closeUpdateItemWFeaturePopup();
       }
     },

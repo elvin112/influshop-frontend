@@ -24,9 +24,8 @@ export default {
     const tokenTestExpiration = 3600;
     const expiresIn = tokenTestExpiration * 1000;
     const expirationDate = new Date().getTime() + expiresIn;
-
     let isInfluencer;
-    if (payload.isInfluencer === "influencer") {
+    if (payload.pickedUserType === "influencer") {
       isInfluencer = true;
     } else {
       isInfluencer = false;
@@ -46,7 +45,7 @@ export default {
       username: responseData.username,
       email: responseData.email,
       token: responseData.token,
-      isInfluencer: payload.isInfluencer,
+      isInfluencer: isInfluencer,
     });
 
     return response.clone();

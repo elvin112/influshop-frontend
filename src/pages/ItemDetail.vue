@@ -1,6 +1,8 @@
 <template>
   <TheHeader />
+
   <div class="wrapper mt-sm">
+    <ItemReport v-if="bringItemReportCard" :itemId="itemId" />
     <div class="image-viewer">
       <div class="main-img-container">
         <img
@@ -84,7 +86,7 @@
       <p class="item-properties__description mb-sm">
         {{ itemDescription }}
       </p>
-      <span class="warn-sign">
+      <span class="warn-sign" @click="itemReportPopupHandler">
         <svg class="warn-sign__icon">
           <use xlink:href="../assets/img/sprite.svg#icon-warning" />
         </svg>
@@ -180,8 +182,11 @@
 </template>
 
 <script>
+import ItemReport from "../components/report/ItemReport.vue";
+
 import { isProxy, toRaw } from "vue";
 import { Cloudinary } from "cloudinary-core"; // If your code is for ES6 or higher
+
 var cl = new Cloudinary({
   cloud_name: "dd9wm6nm3",
   secure: true,
@@ -190,6 +195,12 @@ var cl = new Cloudinary({
 let frame1 = undefined;
 
 export default {
+  components: { ItemReport },
+  provide() {
+    return {
+      closeItemReportPopup: this.closeItemReportPopup,
+    };
+  },
   data() {
     return {
       itemName: null,
@@ -204,12 +215,14 @@ export default {
       isThumb4: false,
       isThumb5: false,
       timer: null,
+      bringItemReportCard: false,
+      itemId: null,
     };
   },
   async created() {
     const itemId = this.$route.params.itemId;
+    this.itemId = itemId;
     let response = null;
-
     if (
       this.$store.getters["auth/isInfluencer"] === "true" ||
       this.$store.getters["auth/isInfluencer"] === null
@@ -235,7 +248,6 @@ export default {
         }
       );
     }
-
     if (!response.ok) {
       alert("Something went wrong!");
     } else {
@@ -253,15 +265,19 @@ export default {
       return this.itemPrice * this.itemQuantity;
     },
   },
-
   methods: {
+    closeItemReportPopup() {
+      this.bringItemReportCard = false;
+    },
+    itemReportPopupHandler() {
+      this.bringItemReportCard = true;
+    },
     async unDislikeItem(index) {
       if (this.itemComments[index].isDislikedByUser == true) {
         if (this.timer) {
           clearTimeout(this.timer);
           console.log("undislike timer cleaned");
         }
-
         this.timer = setTimeout(async () => {
           const response = await fetch(
             `http://localhost:8080/api/v1/comment/dislike`,
@@ -277,7 +293,6 @@ export default {
               }),
             }
           );
-
           if (!response.ok) {
             console.log("undislike not successful");
           } else {
@@ -309,7 +324,6 @@ export default {
               }),
             }
           );
-
           if (!response.ok) {
             console.log("dislike not successful");
           } else {
@@ -324,13 +338,11 @@ export default {
         }, 400);
       }
     },
-
     async unLikeItem(index) {
       if (this.itemComments[index].isLikedByUser == true) {
         if (this.timer) {
           clearTimeout(this.timer);
         }
-
         this.timer = setTimeout(async () => {
           const response = await fetch(
             `http://localhost:8080/api/v1/comment/like`,
@@ -346,7 +358,6 @@ export default {
               }),
             }
           );
-
           if (!response.ok) {
             console.log("unlike not successful");
           } else {
@@ -378,7 +389,6 @@ export default {
               }),
             }
           );
-
           if (!response.ok) {
             console.log("like not successful");
           } else {
@@ -407,7 +417,6 @@ export default {
           this.isThumb1 = true;
           frame12 = this.$refs["thumb-img-1"];
           frame1.src = frame12.src;
-
           break;
         case "thumb-2":
           this.isThumb2 = true;
@@ -428,7 +437,6 @@ export default {
           this.isThumb5 = true;
           frame12 = this.$refs["thumb-img-5"];
           frame1.src = frame12.src;
-
           break;
       }
     },
@@ -458,7 +466,6 @@ export default {
             }
             const frame2 = this.$refs["thumb-img-2"];
             frame2.src = cl.image(imgObj.imageLocation).src;
-
             frame2.display = "inline-block";
             break;
           case 3:
@@ -468,7 +475,6 @@ export default {
             }
             const frame3 = this.$refs["thumb-img-3"];
             frame3.src = cl.image(imgObj.imageLocation).src;
-
             frame3.display = "inline-block";
             break;
           case 4:
@@ -478,7 +484,6 @@ export default {
             }
             const frame4 = this.$refs["thumb-img-4"];
             frame4.src = cl.image(imgObj.imageLocation).src;
-
             frame4.display = "inline-block";
             break;
           case 5:
@@ -489,12 +494,12 @@ export default {
             const frame5 = this.$refs["thumb-img-5"];
             frame5.src = cl.image(imgObj.imageLocation).src;
             frame5.display = "none";
-
             break;
         }
       }
     },
   },
+  components: { ItemReport },
 };
 </script>
 

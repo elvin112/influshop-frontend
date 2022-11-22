@@ -43,7 +43,7 @@
 
 .min-content {
   width: 30vw;
-  min-height: 40vh;
+  min-height: 10vh;
   max-height: 610px;
   top: 15%;
   padding: 1rem;

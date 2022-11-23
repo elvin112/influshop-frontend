@@ -3,6 +3,7 @@
 
   <div class="wrapper mt-sm">
     <ItemReport v-if="bringItemReportCard" :itemId="itemId" />
+    <CommentReport v-if="bringCommentReportCard" :commentId="commentId" />
     <div class="image-viewer">
       <div class="main-img-container">
         <img
@@ -162,7 +163,7 @@
               </svg>
             </span>
 
-            <span>
+            <span @click="commentReportPopupHandler(comment.id)">
               <svg class="warn-sign-icon">
                 <use xlink:href="../assets/img/sprite.svg#icon-warning" />
               </svg>
@@ -183,6 +184,7 @@
 
 <script>
 import ItemReport from "../components/report/ItemReport.vue";
+import CommentReport from "../components/report/CommentReport.vue";
 
 import { isProxy, toRaw } from "vue";
 import { Cloudinary } from "cloudinary-core"; // If your code is for ES6 or higher
@@ -195,10 +197,11 @@ var cl = new Cloudinary({
 let frame1 = undefined;
 
 export default {
-  components: { ItemReport },
+  components: { ItemReport, CommentReport },
   provide() {
     return {
       closeItemReportPopup: this.closeItemReportPopup,
+      closeCommentReportPopup: this.closeCommentReportPopup,
     };
   },
   data() {
@@ -216,7 +219,9 @@ export default {
       isThumb5: false,
       timer: null,
       bringItemReportCard: false,
+      bringCommentReportCard: false,
       itemId: null,
+      commentId: null,
     };
   },
   async created() {
@@ -266,8 +271,15 @@ export default {
     },
   },
   methods: {
+    closeCommentReportPopup() {
+      this.bringCommentReportCard = false;
+    },
     closeItemReportPopup() {
       this.bringItemReportCard = false;
+    },
+    commentReportPopupHandler(commentId) {
+      this.commentId = commentId;
+      this.bringCommentReportCard = true;
     },
     itemReportPopupHandler() {
       this.bringItemReportCard = true;
@@ -499,7 +511,7 @@ export default {
       }
     },
   },
-  components: { ItemReport },
+  components: { ItemReport, CommentReport, CommentReport },
 };
 </script>
 

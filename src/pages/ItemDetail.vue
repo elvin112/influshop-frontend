@@ -4,6 +4,11 @@
   <div class="wrapper mt-sm">
     <ItemReport v-if="bringItemReportCard" :itemId="itemId" />
     <CommentReport v-if="bringCommentReportCard" :commentId="commentId" />
+    <ItemFeedback
+      v-if="bringItemFeedbackCard"
+      :itemId="itemId"
+      :stars="currentStar"
+    />
     <div class="image-viewer">
       <div class="main-img-container">
         <img
@@ -65,23 +70,47 @@
     <div class="item-properties">
       <h1 class="item-properties__title mb-sm">{{ itemName }}</h1>
       <div class="item-properties__title mb-sm">
-        <span>
-          <svg class="star-sign__icon">
-            <use xlink:href="../assets/img/sprite.svg#icon-star-full" />
-          </svg>
-          <svg class="star-sign__icon">
-            <use xlink:href="../assets/img/sprite.svg#icon-star-full" />
-          </svg>
-          <svg class="star-sign__icon">
-            <use xlink:href="../assets/img/sprite.svg#icon-star-full" />
-          </svg>
-          <svg class="star-sign__icon">
-            <use xlink:href="../assets/img/sprite.svg#icon-star-full" />
-          </svg>
-          <svg class="star-sign__icon">
-            <use xlink:href="../assets/img/sprite.svg#icon-star-full" />
-          </svg>
+        <span class="star-sign-container">
+          <span
+            class="fa fa-star"
+            :class="{ checked: isFirstStrActive, hovered: isFirstStrHovered }"
+            @mouseover="hoveringStar(1)"
+            @mouseleave="cancelHoveringStart"
+            @click="feedbackHandler(1)"
+          ></span>
+          <span
+            class="fa fa-star"
+            :class="{ checked: isSecondStrActive, hovered: isSecondStrHovered }"
+            @mouseover="hoveringStar(2)"
+            @mouseleave="cancelHoveringStart"
+            @click="feedbackHandler(2)"
+          ></span>
+          <span
+            class="fa fa-star"
+            :class="{ checked: isThirdStrActive, hovered: isThirdStrHovered }"
+            @mouseover="hoveringStar(3)"
+            @mouseleave="cancelHoveringStart"
+            @click="feedbackHandler(3)"
+          ></span>
+          <span
+            class="fa fa-star"
+            :class="{ checked: isFourthStrActive, hovered: isFourthStrHovered }"
+            @mouseover="hoveringStar(4)"
+            @mouseleave="cancelHoveringStart"
+            @click="feedbackHandler(4)"
+          ></span>
+          <span
+            class="fa fa-star"
+            :class="{ checked: isFifthStrActive, hovered: isFifthStrHovered }"
+            @mouseover="hoveringStar(5)"
+            @mouseleave="cancelHoveringStart"
+            @click="feedbackHandler(5)"
+          ></span>
         </span>
+        <span class="average-stars">{{ averageStars }}</span>
+        <span v-if="isFeedbackReceived" class="your-feedback-received"
+          >Your feedback received!</span
+        >
       </div>
 
       <p class="item-properties__description mb-sm">
@@ -185,6 +214,7 @@
 <script>
 import ItemReport from "../components/report/ItemReport.vue";
 import CommentReport from "../components/report/CommentReport.vue";
+import ItemFeedback from "../components/feedback/ItemFeedback.vue";
 
 import { isProxy, toRaw } from "vue";
 import { Cloudinary } from "cloudinary-core"; // If your code is for ES6 or higher
@@ -197,13 +227,15 @@ var cl = new Cloudinary({
 let frame1 = undefined;
 
 export default {
-  components: { ItemReport, CommentReport },
+  components: { ItemReport, CommentReport, ItemFeedback },
   provide() {
     return {
       closeItemReportPopup: this.closeItemReportPopup,
       closeCommentReportPopup: this.closeCommentReportPopup,
+      closeItemFeedbackPopup: this.closeItemFeedbackPopup,
     };
   },
+
   data() {
     return {
       itemName: null,
@@ -211,6 +243,7 @@ export default {
       itemPrice: null,
       itemImages: null,
       itemQuantity: 1,
+      averageStars: 0,
       itemComments: [],
       isThumb1: true,
       isThumb2: false,
@@ -218,59 +251,146 @@ export default {
       isThumb4: false,
       isThumb5: false,
       timer: null,
+      timer2: null,
       bringItemReportCard: false,
       bringCommentReportCard: false,
+      bringItemFeedbackCard: false,
       itemId: null,
       commentId: null,
+      isFirstStrHovered: false,
+      isSecondStrHovered: false,
+      isThirdStrHovered: false,
+      isFourthStrHovered: false,
+      isFifthStrHovered: false,
+      currentStar: null,
+      isFeedbackReceived: false,
     };
   },
   async created() {
-    const itemId = this.$route.params.itemId;
-    this.itemId = itemId;
-    let response = null;
-    if (
-      this.$store.getters["auth/isInfluencer"] === "true" ||
-      this.$store.getters["auth/isInfluencer"] === null
-    ) {
-      response = await fetch(
-        `http://localhost:8080/api/v1/item-ops/item/${itemId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    } else if (this.$store.getters["auth/isInfluencer"] === "false") {
-      response = await fetch(
-        `http://localhost:8080/api/v1/item-ops/item/${itemId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + this.$store.getters["auth/token"],
-          },
-        }
-      );
-    }
-    if (!response.ok) {
-      alert("Something went wrong!");
-    } else {
-      const data = await response.json();
-      this.itemName = data.item.name;
-      this.itemDescription = data.item.description;
-      this.itemPrice = data.item.price;
-      this.itemImages = data.item.images;
-      this.itemComments = data.item.comments;
-      this.loadImages();
-    }
+    this.loadProduct(true);
   },
   computed: {
     itemFinalPrice() {
       return this.itemPrice * this.itemQuantity;
     },
+    isFirstStrActive() {
+      return this.averageStars;
+    },
+    isSecondStrActive() {
+      return this.averageStars >= 2;
+    },
+    isThirdStrActive() {
+      return this.averageStars >= 3;
+    },
+    isFourthStrActive() {
+      return this.averageStars >= 4;
+    },
+    isFifthStrActive() {
+      return this.averageStars >= 5;
+    },
   },
   methods: {
+    async loadProduct(firstTime) {
+      if (!firstTime) {
+        this.isFeedbackReceived = true;
+      }
+      const itemId = this.$route.params.itemId;
+      this.itemId = itemId;
+      let response = null;
+      if (
+        this.$store.getters["auth/isInfluencer"] === "true" ||
+        this.$store.getters["auth/isInfluencer"] === null
+      ) {
+        response = await fetch(
+          `http://localhost:8080/api/v1/item-ops/item/${itemId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } else if (this.$store.getters["auth/isInfluencer"] === "false") {
+        response = await fetch(
+          `http://localhost:8080/api/v1/item-ops/item/${itemId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + this.$store.getters["auth/token"],
+            },
+          }
+        );
+      }
+      if (!response.ok) {
+        alert("Something went wrong!");
+      } else {
+        const data = await response.json();
+        this.itemName = data.item.name;
+        this.itemDescription = data.item.description;
+        this.itemPrice = data.item.price;
+        this.itemImages = data.item.images;
+        this.itemComments = data.item.comments;
+        this.averageStars = parseFloat(data.item.averageStars).toFixed(2);
+        this.loadImages();
+      }
+    },
+    closeItemFeedbackPopup(isCreated) {
+      if (isCreated) {
+        this.loadProduct(false);
+      }
+      this.bringItemFeedbackCard = false;
+    },
+    feedbackHandler(numOfStar) {
+      this.currentStar = numOfStar;
+      this.bringItemFeedbackCard = true;
+    },
+    cancelHoveringStart() {
+      this.isFirstStrHovered = false;
+      this.isSecondStrHovered = false;
+      this.isThirdStrHovered = false;
+      this.isFourthStrHovered = false;
+      this.isFifthStrHovered = false;
+    },
+    hoveringStar(n) {
+      this.isFirstStrHovered = false;
+      this.isSecondStrHovered = false;
+      this.isThirdStrHovered = false;
+      this.isFourthStrHovered = false;
+      this.isFifthStrHovered = false;
+
+      switch (n) {
+        case 1:
+          this.isFirstStrHovered = true;
+          break;
+
+        case 2:
+          this.isFirstStrHovered = true;
+          this.isSecondStrHovered = true;
+          break;
+
+        case 3:
+          this.isFirstStrHovered = true;
+          this.isSecondStrHovered = true;
+          this.isThirdStrHovered = true;
+          break;
+
+        case 4:
+          this.isFirstStrHovered = true;
+          this.isSecondStrHovered = true;
+          this.isThirdStrHovered = true;
+          this.isFourthStrHovered = true;
+          break;
+
+        case 5:
+          this.isFirstStrHovered = true;
+          this.isSecondStrHovered = true;
+          this.isThirdStrHovered = true;
+          this.isFourthStrHovered = true;
+          this.isFifthStrHovered = true;
+          break;
+      }
+    },
     closeCommentReportPopup() {
       this.bringCommentReportCard = false;
     },
@@ -320,8 +440,13 @@ export default {
         if (this.timer) {
           clearTimeout(this.timer);
         }
-        console.log(this.itemComments[index]);
         this.timer = setTimeout(async () => {
+          if (this.itemComments[index].isLikedByUser == true) {
+            await this.unLikeItem(index);
+            return;
+          }
+          console.log(this.itemComments[index]);
+
           const response = await fetch(
             `http://localhost:8080/api/v1/comment/dislike`,
             {
@@ -342,10 +467,6 @@ export default {
             console.log("dislike is successful");
             this.itemComments[index].dislikes++;
             this.itemComments[index].isDislikedByUser = true;
-            if (this.itemComments[index].isLikedByUser == true) {
-              this.itemComments[index].likes--;
-              this.itemComments[index].isLikedByUser = false;
-            }
           }
         }, 400);
       }
@@ -373,7 +494,6 @@ export default {
           if (!response.ok) {
             console.log("unlike not successful");
           } else {
-            console.log("unlike is successful");
             this.itemComments[index].likes--;
             this.itemComments[index].isLikedByUser = false;
           }
@@ -382,11 +502,14 @@ export default {
     },
     async likeItem(index) {
       if (this.itemComments[index].isLikedByUser == false) {
-        if (this.timer) {
-          clearTimeout(this.timer);
+        if (this.timer2) {
+          clearTimeout(this.timer2);
         }
-        console.log(this.itemComments[index]);
-        this.timer = setTimeout(async () => {
+        this.timer2 = setTimeout(async () => {
+          if (this.itemComments[index].isDislikedByUser == true) {
+            await this.unDislikeItem(index);
+            return;
+          }
           const response = await fetch(
             `http://localhost:8080/api/v1/comment/like`,
             {
@@ -404,13 +527,8 @@ export default {
           if (!response.ok) {
             console.log("like not successful");
           } else {
-            console.log("like is successful");
             this.itemComments[index].likes++;
             this.itemComments[index].isLikedByUser = true;
-            if (this.itemComments[index].isDislikedByUser == true) {
-              this.itemComments[index].dislikes--;
-              this.itemComments[index].isDislikedByUser = false;
-            }
           }
         }, 400);
       }
@@ -511,10 +629,18 @@ export default {
       }
     },
   },
-  components: { ItemReport, CommentReport, CommentReport },
+  components: { ItemReport, CommentReport, ItemFeedback },
 };
 </script>
 
 <style scoped lang="scss">
 @import "./ItemDetail.module.scss";
+
+.checked {
+  color: orange;
+}
+
+.hovered {
+  color: var(--color-primary);
+}
 </style>

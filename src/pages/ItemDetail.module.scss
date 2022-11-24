@@ -2,7 +2,7 @@
   padding: var(--content-padding);
   display: grid;
   grid-template-columns: 22rem 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: min-content 1fr;
   gap: 2rem;
   // width: 92%;
   background-color: var(--color-grey-light-2);
@@ -43,6 +43,13 @@
       }
     }
   }
+  .average-stars {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    font-size: 1.1rem;
+    // position: absolute;
+    // top: 3.8rem;
+  }
 
   .item-properties {
     position: relative;
@@ -66,16 +73,6 @@
       // color: var(--color-grey-dark-1);
       color: var(--color-grey-dark-2);
       // color: black;
-
-      span {
-        .star-sign__icon {
-          width: 1.8rem;
-          height: 1.8rem;
-          fill: #fabf35;
-          margin-right: 0.5rem;
-          // stroke: #ffffff;
-        }
-      }
     }
 
     &__description {
@@ -88,6 +85,12 @@
       min-height: 9rem;
       max-height: 9rem;
       white-space: pre-wrap;
+    }
+
+    .your-feedback-received {
+      font-family: "Montserrat", sans-serif;
+      font-size: 0.7rem;
+      color: var(--color-success);
     }
 
     .order-specification {
@@ -150,6 +153,11 @@
 
   span:not(:last-child) {
     margin-right: 1rem;
+  }
+
+  .fa-star:not(:last-child) {
+    padding-right: 1rem;
+    margin-right: 0rem;
   }
 
   .reviews {

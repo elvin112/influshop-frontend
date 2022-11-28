@@ -42,7 +42,7 @@
 }
 
 .min-content {
-  width: 30vw;
+  width: 35vw;
   min-height: 10vh;
   max-height: 610px;
   top: 15%;

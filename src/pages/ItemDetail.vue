@@ -9,6 +9,10 @@
       :itemId="itemId"
       :stars="currentStar"
     />
+    <CommentDeletionSimplePopup
+      v-if="bringCommentDeletionCard"
+      :commentId="commentId"
+    />
     <div class="image-viewer">
       <div class="main-img-container">
         <img
@@ -197,6 +201,15 @@
                 <use xlink:href="../assets/img/sprite.svg#icon-warning" />
               </svg>
             </span>
+
+            <span
+              v-if="comment.username === username"
+              @click="commentDeletionPopupHandler(comment.id)"
+            >
+              <svg class="delete-comment-icon">
+                <use xlink:href="../assets/img/sprite.svg#icon-bin" />
+              </svg>
+            </span>
           </div>
         </div>
         <div class="review__user-comment mt-sm">
@@ -215,6 +228,7 @@
 import ItemReport from "../components/report/ItemReport.vue";
 import CommentReport from "../components/report/CommentReport.vue";
 import ItemFeedback from "../components/feedback/ItemFeedback.vue";
+import CommentDeletionSimplePopup from "../components/feedback/CommentDeletionSimplePopup.vue";
 
 import { isProxy, toRaw } from "vue";
 import { Cloudinary } from "cloudinary-core"; // If your code is for ES6 or higher
@@ -227,12 +241,13 @@ var cl = new Cloudinary({
 let frame1 = undefined;
 
 export default {
-  components: { ItemReport, CommentReport, ItemFeedback },
   provide() {
     return {
       closeItemReportPopup: this.closeItemReportPopup,
       closeCommentReportPopup: this.closeCommentReportPopup,
       closeItemFeedbackPopup: this.closeItemFeedbackPopup,
+      closeCommentDeletionPopup: this.closeCommentDeletionPopup,
+      deleteComment: this.deleteComment,
     };
   },
 
@@ -255,6 +270,7 @@ export default {
       bringItemReportCard: false,
       bringCommentReportCard: false,
       bringItemFeedbackCard: false,
+      bringCommentDeletionCard: false,
       itemId: null,
       commentId: null,
       isFirstStrHovered: false,
@@ -270,6 +286,9 @@ export default {
     this.loadProduct(true);
   },
   computed: {
+    username() {
+      return this.$store.getters["auth/username"];
+    },
     itemFinalPrice() {
       return this.itemPrice * this.itemQuantity;
     },
@@ -290,6 +309,36 @@ export default {
     },
   },
   methods: {
+    async deleteComment() {
+      const response = await fetch(
+        `http://localhost:8080/api/v1/comment/${this.commentId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + this.$store.getters["auth/token"],
+          },
+        }
+      );
+
+      if (!response.ok) {
+        // comment not deleted; error handler
+        return;
+      } else {
+        const data = await response.json();
+        this.itemComments = this.itemComments.filter(
+          (comment) => comment.id !== this.commentId
+        );
+      }
+      this.closeCommentDeletionPopup();
+    },
+    closeCommentDeletionPopup() {
+      this.bringCommentDeletionCard = false;
+    },
+    commentDeletionPopupHandler(commentId) {
+      this.commentId = commentId;
+      this.bringCommentDeletionCard = true;
+    },
     async loadProduct(firstTime) {
       if (!firstTime) {
         this.isFeedbackReceived = true;
@@ -332,6 +381,9 @@ export default {
         this.itemImages = data.item.images;
         this.itemComments = data.item.comments;
         this.averageStars = parseFloat(data.item.averageStars).toFixed(2);
+        if (this.averageStars === "NaN") {
+          this.averageStars = 0;
+        }
         this.loadImages();
       }
     },
@@ -563,7 +615,6 @@ export default {
       this.isThumb5 = false;
       frame1 = this.$refs["main-img"];
       let frame12 = null;
-      console.log("change picture running.");
       switch (msg) {
         case "thumb-1":
           this.isThumb1 = true;
@@ -651,7 +702,12 @@ export default {
       }
     },
   },
-  components: { ItemReport, CommentReport, ItemFeedback },
+  components: {
+    ItemReport,
+    CommentReport,
+    ItemFeedback,
+    CommentDeletionSimplePopup,
+  },
 };
 </script>
 

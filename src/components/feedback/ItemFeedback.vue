@@ -5,7 +5,7 @@
         Rate product
         <svg
           class="header-title close-sign__icon"
-          @click="this.closeItemFeedbackPopup"
+          @click="this.closeItemFeedbackPopup()"
         >
           <use xlink:href="../../assets/img/sprite.svg#icon-close" />
         </svg>
@@ -140,43 +140,6 @@ export default {
     }
 
     this.currentStar = this.stars;
-
-    // const payload = {
-    //   commentId: this.commentId,
-    //   isReaderUser: isUser,
-    // };
-
-    // const response = await fetch(
-    //   `http://localhost:8080/api/v1/report/comment/read`,
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: "Bearer " + this.$store.getters["auth/token"],
-    //     },
-    //     body: JSON.stringify(payload),
-    //   }
-    // );
-
-    // if (!response.ok) {
-    //   throw Error("Something went wrong");
-    // } else {
-    //   const data = await response.json();
-    //   if (data.message.includes("Comment Report Not Found")) {
-    //     return;
-    //   } else {
-    //     const reason = data.commentReport.report;
-    //     this.prevRepReason = reason;
-    //     if (reason === "INAPPROPRIATE_COMMENT") {
-    //       this.picked = "comment";
-    //     } else if (reason === "INAPPROPRIATE_IMAGE") {
-    //       this.picked = "image";
-    //     } else {
-    //       this.picked = "other";
-    //     }
-    //     this.alreadyReported = true;
-    //   }
-    // }
   },
   methods: {
     starController(stars) {
@@ -234,7 +197,7 @@ export default {
         itemId: this.itemId,
         comment: this.comment,
       };
-
+      console.log(payload);
       const response = await fetch(`http://localhost:8080/api/v1/comment/`, {
         method: "POST",
         headers: {

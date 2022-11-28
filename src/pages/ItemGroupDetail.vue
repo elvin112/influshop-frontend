@@ -19,7 +19,7 @@
         />
       </div>
 
-      <div class="thumb-images">
+      <div class="thumb-images" ref="thumb-images" style="visibility: hidden">
         <img
           src="../assets/img/no-img-placeholder.jpeg"
           alt=""
@@ -68,9 +68,11 @@
       </div>
     </div>
     <div class="item-properties">
-      <h1 class="item-properties__title mb-sm">{{ itemName }}</h1>
+      <h1 class="item-properties__title mb-sm">
+        {{ itemName !== null ? itemName : itemGroupName }}
+      </h1>
       <div class="item-properties__title mb-sm">
-        <span class="star-sign-container">
+        <span class="star-sign-container" style="display: none">
           <span
             class="fa fa-star"
             :class="{ checked: isFirstStrActive, hovered: isFirstStrHovered }"
@@ -107,23 +109,62 @@
             @click="feedbackHandler(5)"
           ></span>
         </span>
-        <span class="average-stars">{{ averageStars }}</span>
+        <span class="average-stars" style="display: none">{{
+          averageStars
+        }}</span>
         <span v-if="isFeedbackReceived" class="your-feedback-received"
           >Your feedback received!</span
         >
       </div>
 
       <p class="item-properties__description mb-sm">
-        {{ itemDescription }}
+        {{ itemDescription !== null ? itemDescription : itemGroupDescription }}
       </p>
-      <span class="warn-sign" @click="itemReportPopupHandler">
+      <span
+        class="warn-sign"
+        @click="itemReportPopupHandler"
+        style="visibility: hidden"
+      >
         <svg class="warn-sign__icon">
           <use xlink:href="../assets/img/sprite.svg#icon-warning" />
         </svg>
       </span>
       <hr />
       <div class="order-specification">
-        <div class="quantityWprice">
+        <div class="order-specification__extraFeatures">
+          <p class="extraFeatuers-title">SELECT FEATURE</p>
+          <div class="extraFeatures__select-container">
+            <select
+              name=""
+              id=""
+              ref=""
+              :key="prop"
+              v-for="prop in listOfProperties"
+              class="feature-select"
+              @change="featureOptionHandler(false)"
+            >
+              <option
+                selected="true"
+                disabled="disabled"
+                :value="prop"
+                :key="prop"
+                class="feature-name"
+              >
+                {{ prop }}
+              </option>
+              <option
+                :key="elem"
+                class="feature-content"
+                :value="elem"
+                v-for="elem in itemGroupExtraFeaturesConverted[prop]"
+              >
+                {{ elem }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="quantityWprice" style="visibility: hidden">
           <div class="quantityWprice__price">
             <p class="price-text">${{ itemFinalPrice }}</p>
           </div>
@@ -140,12 +181,16 @@
         </div>
 
         <div class="order-specification__buttons mt-sm">
-          <button class="btn btn--outline">Add to Cart</button>
-          <button class="btn btn--primary mb-sm">Buy Now</button>
+          <button class="btn btn--outline disabled-button" disabled>
+            Add to Cart
+          </button>
+          <button class="btn btn--primary mb-sm disabled-button" disabled>
+            Buy Now
+          </button>
         </div>
       </div>
     </div>
-    <div class="reviews mt-md">
+    <div class="reviews mt-md" style="visibility: hidden">
       <h2 class="reviews-title mb-sm">Reviews</h2>
 
       <div
@@ -176,6 +221,7 @@
             </span>
             <span>
               {{ comment.dislikes }}
+
               <svg
                 class="dislike-icon"
                 v-if="comment.isDislikedByUser"
@@ -238,8 +284,14 @@ export default {
 
   data() {
     return {
+      itemGroupName: null,
+      itemGroupDescription: null,
+      itemGroupImage: null,
+      itemGroupExtraFeatures: null,
+      itemGroupExtraFeaturesConverted: null,
       itemName: null,
       itemDescription: null,
+      listOfProperties: null,
       itemPrice: null,
       itemImages: null,
       itemQuantity: 1,
@@ -256,6 +308,7 @@ export default {
       bringCommentReportCard: false,
       bringItemFeedbackCard: false,
       itemId: null,
+      itemGroupId: null,
       commentId: null,
       isFirstStrHovered: false,
       isSecondStrHovered: false,
@@ -264,6 +317,7 @@ export default {
       isFifthStrHovered: false,
       currentStar: null,
       isFeedbackReceived: false,
+      itemGroupOwnerName: null,
     };
   },
   async created() {
@@ -293,46 +347,182 @@ export default {
     async loadProduct(firstTime) {
       if (!firstTime) {
         this.isFeedbackReceived = true;
+        this.featureOptionHandler();
+        return;
       }
-      const itemId = this.$route.params.itemId;
-      this.itemId = itemId;
-      let response = null;
-      if (
-        this.$store.getters["auth/isInfluencer"] === "true" ||
-        this.$store.getters["auth/isInfluencer"] === null
-      ) {
-        response = await fetch(
-          `http://localhost:8080/api/v1/item-ops/item/${itemId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-      } else if (this.$store.getters["auth/isInfluencer"] === "false") {
-        response = await fetch(
-          `http://localhost:8080/api/v1/item-ops/item/${itemId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + this.$store.getters["auth/token"],
-            },
-          }
-        );
-      }
+
+      const itemGroupId = this.$route.params.itemGroupId;
+      this.itemGroupId = itemGroupId;
+
+      const response = await fetch(
+        `http://localhost:8080/api/v1/item-ops/item-group/${itemGroupId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       if (!response.ok) {
         alert("Something went wrong!");
       } else {
         const data = await response.json();
+        this.itemGroupName = data.itemGroup.itemGroupName;
+        this.itemGroupDescription = data.itemGroup.itemGroupDescription;
+        this.itemGroupImage = data.itemGroup.imageLocation;
+        this.itemGroupExtraFeatures = data.itemGroup.extraFeatures;
+        this.itemGroupOwnerName = data.itemGroup.influencerName;
+        this.loadGroupImage();
+        this.loadExtraFeatures();
+        if (this.$route.query) {
+          const queryObj = this.$route.query;
+
+          let featureSelectNodes =
+            document.getElementsByClassName("feature-select");
+          let featureNodes = document.getElementsByClassName("feature-name");
+          let featureContentNodes =
+            document.getElementsByClassName("feature-content");
+
+          let queryParams = "";
+          let index = 0;
+          for (const property in queryObj) {
+            if (index !== 0) {
+              queryParams += "&";
+            }
+
+            // featureSelectNodes[index].value = queryObj[property];
+
+            queryParams += `${property}=${queryObj[property]}`;
+            index++;
+          }
+          this.featureOptionHandler(queryParams);
+        }
+      }
+    },
+
+    async featureOptionHandler(queryParam) {
+      let queryParams = "";
+      if (!queryParam) {
+        const featureSelectNodes =
+          document.getElementsByClassName("feature-select");
+        const featureNodes = document.getElementsByClassName("feature-name");
+        const featureContentNodes =
+          document.getElementsByClassName("feature-content");
+
+        for (let index = 0; index < featureNodes.length; index++) {
+          if (index !== 0) {
+            queryParams += "&";
+          }
+          const prop = featureNodes[index].innerHTML;
+          const cont = featureSelectNodes[index].value;
+          queryParams += `${prop}=${cont}`;
+        }
+        this.$router.push(
+          `/itemGroupDetail/${this.itemGroupId}?${queryParams}`
+        );
+      } else {
+        queryParams = queryParam;
+      }
+
+      const response = await fetch(
+        `http://localhost:8080/api/v1/item-ops/item/${this.itemGroupOwnerName}/${this.itemGroupName}/extra?${queryParams}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + this.$store.getters["auth/token"],
+          },
+        }
+      );
+
+      if (!response.ok) {
+        this.setItemGroupMode();
+      } else {
+        const data = await response.json();
+        this.itemId = data.item.id;
         this.itemName = data.item.name;
         this.itemDescription = data.item.description;
         this.itemPrice = data.item.price;
         this.itemImages = data.item.images;
         this.itemComments = data.item.comments;
         this.averageStars = parseFloat(data.item.averageStars).toFixed(2);
+        if (this.averageStars === "NaN") {
+          this.averageStars = 0;
+        }
         this.loadImages();
+        this.setFlatItemMode();
+      }
+    },
+    setItemGroupMode() {
+      this.itemName = null;
+      this.itemDescription = null;
+      this.itemPrice = null;
+      this.itemImages = null;
+      this.itemComments = null;
+      this.averageStars = null;
+      this.loadGroupImage();
+      this.loadExtraFeatures();
+      const thumbNode = this.$refs["thumb-images"];
+      thumbNode.style.visibility = "hidden";
+      const feedbackStar = document.getElementsByClassName(
+        "star-sign-container"
+      )[0];
+      feedbackStar.style.display = "none";
+
+      const averageStars = document.getElementsByClassName("average-stars")[0];
+      averageStars.style.display = "none";
+
+      const warnSign = document.getElementsByClassName("warn-sign")[0];
+      warnSign.style.visibility = "hidden";
+
+      const quantityWprice =
+        document.getElementsByClassName("quantityWprice")[0];
+      quantityWprice.style.visibility = "hidden";
+
+      const reviews = document.getElementsByClassName("reviews")[0];
+      reviews.style.visibility = "hidden";
+
+      // disabled-button
+      const button1 = document.getElementsByClassName("disabled-button")[0];
+      const button2 = document.getElementsByClassName("disabled-button")[1];
+      button1.disabled = true;
+      button2.disabled = true;
+    },
+    setFlatItemMode() {
+      const thumbNode = this.$refs["thumb-images"];
+      thumbNode.style.visibility = "visible";
+      const feedbackStar = document.getElementsByClassName(
+        "star-sign-container"
+      )[0];
+      feedbackStar.style.display = "unset";
+      const averageStars = document.getElementsByClassName("average-stars")[0];
+      averageStars.style.display = "unset";
+
+      const warnSign = document.getElementsByClassName("warn-sign")[0];
+      warnSign.style.visibility = "visible";
+
+      const quantityWprice =
+        document.getElementsByClassName("quantityWprice")[0];
+      quantityWprice.style.visibility = "visible";
+
+      const reviews = document.getElementsByClassName("reviews")[0];
+      reviews.style.visibility = "visible";
+
+      // disabled-button
+      const button1 = document.getElementsByClassName("disabled-button")[0];
+      const button2 = document.getElementsByClassName("disabled-button")[1];
+      button1.disabled = false;
+      button2.disabled = false;
+    },
+    loadExtraFeatures() {
+      this.listOfProperties = [];
+      const imgObj = toRaw(this.itemGroupImage);
+
+      let itemGroupExtraFeaturesTemp = toRaw(this.itemGroupExtraFeatures);
+      this.itemGroupExtraFeaturesConverted = itemGroupExtraFeaturesTemp;
+      for (const elem in itemGroupExtraFeaturesTemp) {
+        this.listOfProperties.push(elem);
       }
     },
     closeItemFeedbackPopup(isCreated) {
@@ -341,7 +531,6 @@ export default {
       }
       this.bringItemFeedbackCard = false;
     },
-
     async feedbackHandler(numOfStar) {
       this.currentStar = numOfStar;
       // check whether item is purchased by the user
@@ -467,7 +656,11 @@ export default {
             await this.unLikeItem(index);
             return;
           }
-          console.log(this.itemComments[index]);
+
+          const payload = {
+            commentId: this.itemComments[index].id + "",
+            isDislike: true,
+          };
 
           const response = await fetch(
             `http://localhost:8080/api/v1/comment/dislike`,
@@ -477,10 +670,7 @@ export default {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + this.$store.getters["auth/token"],
               },
-              body: JSON.stringify({
-                commentId: this.itemComments[index].id + "",
-                isDislike: true,
-              }),
+              body: JSON.stringify(payload),
             }
           );
           if (!response.ok) {
@@ -532,6 +722,10 @@ export default {
             await this.unDislikeItem(index);
             return;
           }
+          const payload = {
+            commentId: this.itemComments[index].id + "",
+            isLike: true,
+          };
           const response = await fetch(
             `http://localhost:8080/api/v1/comment/like`,
             {
@@ -540,10 +734,7 @@ export default {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + this.$store.getters["auth/token"],
               },
-              body: JSON.stringify({
-                commentId: this.itemComments[index].id + "",
-                isLike: true,
-              }),
+              body: JSON.stringify(payload),
             }
           );
           if (!response.ok) {
@@ -563,7 +754,6 @@ export default {
       this.isThumb5 = false;
       frame1 = this.$refs["main-img"];
       let frame12 = null;
-      console.log("change picture running.");
       switch (msg) {
         case "thumb-1":
           this.isThumb1 = true;
@@ -599,6 +789,13 @@ export default {
       if (this.itemQuantity !== 1) {
         this.itemQuantity--;
       }
+    },
+    loadGroupImage() {
+      const imgObj = toRaw(this.itemGroupImage);
+      frame1 = this.$refs["main-img"];
+      // thumbImages = this.$refs["thumb-images"];
+      // thumbImages.display = "none";
+      frame1.src = cl.image(imgObj).src;
     },
     loadImages() {
       for (let index = 0; index < this.itemImages.length; index++) {
@@ -656,7 +853,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "./ItemDetail.module.scss";
+@import "./ItemGroupDetail.module.scss";
 
 .checked {
   color: orange;
@@ -664,5 +861,33 @@ export default {
 
 .hovered {
   color: var(--color-primary);
+}
+
+// button {
+//   border: 1px solid #0066cc;
+//   background-color: #0099cc;
+//   color: #ffffff;
+//   padding: 5px 10px;
+// }
+
+// button:hover {
+//   border: 1px solid #0099cc;
+//   background-color: #00aacc;
+//   color: #ffffff;
+//   padding: 5px 10px;
+// }
+
+span:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  box-shadow: none;
+}
+
+button:disabled,
+button[disabled] {
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+  box-shadow: none;
 }
 </style>

@@ -533,8 +533,8 @@ export default {
           this.propertyWContents = {};
           let tempExtraFeatures = [];
           for (let index = 0; index < propertyNodes.length; index++) {
-            const key = propertyNodes[index].value;
-            const value = contentNodes[index].value;
+            let key = propertyNodes[index].value;
+            let value = contentNodes[index].value;
             if (value === "") {
               value = null;
             }
@@ -599,8 +599,8 @@ export default {
       this.propertyWContents = {};
       let tempExtraFeatures = [];
       for (let index = 0; index < propertyNodes.length; index++) {
-        const key = propertyNodes[index].value;
-        const value = contentNodes[index].value;
+        let key = propertyNodes[index].value;
+        let value = contentNodes[index].value;
         if (value === "") {
           value = null;
         }

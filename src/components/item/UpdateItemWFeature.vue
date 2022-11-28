@@ -233,7 +233,7 @@
 import { isProxy, toRaw } from "vue";
 import { Cloudinary } from "cloudinary-core"; // If your code is for ES6 or higher
 var cl = new Cloudinary({
-  cloud_name: "dd9wm6nm3",
+  cloud_name: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
   secure: true,
 });
 export default {
@@ -363,8 +363,8 @@ export default {
       this.propertyWContents = {};
       let tempExtraFeatures = {};
       for (let index = 0; index < propertyNodes.length; index++) {
-        const key = propertyNodes[index].value;
-        const value = contentNodes[index].value;
+        let key = propertyNodes[index].value;
+        let value = contentNodes[index].value;
         if (value === "") {
           value = null;
         }

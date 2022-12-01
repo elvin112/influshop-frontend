@@ -507,7 +507,6 @@ export default {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + this.$store.getters["auth/token"],
           },
         }
       );

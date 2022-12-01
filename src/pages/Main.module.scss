@@ -1,0 +1,153 @@
+.wrapper {
+  background-color: var(--color-grey-light-2);
+  padding: var(--content-padding);
+  display: grid;
+  grid-template-columns: 20% 75%;
+  min-height: 80vh;
+
+  .error-msg {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    line-height: 1.6;
+    font-size: 1.5rem;
+    color: var(--color-primary--3);
+    margin: auto auto;
+    text-align: center;
+    transform: translateX(-50%);
+  }
+  .inner-wrapper {
+    display: grid;
+    grid-template-rows: min-content;
+
+    .item-container {
+      margin-top: 1rem;
+      margin-bottom: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+
+      .item {
+        transition: 200ms;
+        &:hover {
+          scale: 1.1;
+        }
+
+        &:not(-last-child) {
+          margin-right: 0.9rem;
+        }
+
+        display: flex;
+        position: relative;
+        flex-direction: column;
+        background-color: white;
+        box-shadow: var(--shadow-light);
+        border-radius: var(--card-border-radius);
+        overflow: hidden;
+        width: min-content;
+        margin-top: 1.9rem;
+        min-height: 22.7rem;
+        max-height: 22.7rem;
+
+        &__add-to-favorite {
+          position: absolute;
+          right: 0.2rem;
+          top: 0.5rem;
+          width: min-content;
+          height: 1.3rem;
+
+          .heart-icon {
+            width: 2rem;
+            height: 1.3rem;
+            fill: transparent;
+            stroke: var(--color-grey-dark-1);
+            stroke-width: 3px;
+            cursor: pointer;
+            z-index: 99;
+          }
+        }
+
+        &__picture {
+          width: 230px;
+          height: 230px;
+        }
+
+        &-info {
+          display: grid;
+          grid-template-rows: 1fr 1fr;
+          padding: 0.25rem 0.5rem;
+
+          &__star {
+            font-family: "Montserrat", sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+          }
+
+          &__title-stars {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .item-info__star {
+              display: flex;
+              align-items: center;
+            }
+            .star-icon {
+              width: 1.5rem;
+              height: 1.5rem;
+              fill: gold;
+              stroke: #ffffff;
+              cursor: pointer;
+            }
+          }
+
+          &__title {
+            font-family: "Montserrat", sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--color-grey-dark-1);
+          }
+
+          &__price-availability {
+            margin-top: 0.3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+
+          &__price {
+            font-family: "Montserrat", sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+          }
+
+          &__availability {
+            border: none;
+            background-color: var(--color-success--2);
+            font-family: "Montserrat", sans-serif;
+            font-weight: 600;
+            font-size: 0.7rem;
+            line-height: 1.6;
+            color: white;
+            padding: 0.2rem;
+          }
+
+          .soldOut {
+            background-color: red;
+          }
+        }
+
+        &__view-detail {
+          width: 80%;
+          margin-top: auto;
+          margin-left: auto;
+          margin-right: auto;
+          margin-bottom: 0.67rem;
+
+          padding: 0.1rem;
+
+          font-family: "Montserrat", sans-serif;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}

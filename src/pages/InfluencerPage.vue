@@ -11,6 +11,50 @@
 
     <p v-else-if="!isLoading && errorMsg" class="error-msg">{{ errorMsg }}</p>
     <div class="inner-wrapper" v-else>
+      <div class="influencer-info">
+        <div class="influencer-info__profile">
+          <img
+            src="../assets/img/no-img-placeholder.jpeg"
+            alt="An influencer."
+            class="avatar"
+          />
+          <h2 class="influencer-name">{{ influencerName }}</h2>
+        </div>
+
+        <span
+          class="influencer-info__report"
+          @click="
+            {
+            }
+          "
+        >
+          <svg class="report__icon">
+            <use xlink:href="../assets/img/sprite.svg#icon-warning" />
+          </svg>
+        </span>
+      </div>
+      <router-link
+        class="pinned-item-router"
+        :to="
+          pinnedItem.type === 'itemGroup'
+            ? '/itemGroupDetail/' + pinnedItem.id
+            : '/itemDetail/' + pinnedItem.id
+        "
+      >
+        <div class="pinned-item mb-sm" v-if="pinnedItem">
+          <img
+            :src="loadItemImg(pinnedItem.imageLocation)"
+            alt="An item."
+            class="pinned-item__img"
+          />
+          <div class="pinned-item__title-description">
+            <p class="pinned-item__title">{{ pinnedItem.name }}</p>
+            <p class="pinned-item__description">
+              {{ pinnedItem.description }}
+            </p>
+          </div>
+        </div>
+      </router-link>
       <div class="item-container">
         <div class="item" v-for="item in items">
           <img
@@ -74,18 +118,13 @@ var cl = new Cloudinary({
   secure: true,
 });
 
-window.onscroll = function (ev) {
-  if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-    console.log("end");
-  }
-};
-
 export default {
   data() {
     return {
       isLoading: true,
       errorMsg: "",
       items: [],
+      pinnedItem: null,
       influencerName: null,
       itemImages: [],
     };
@@ -93,16 +132,29 @@ export default {
   async mounted() {
     this.isLoading = true;
     this.errorMsg = null;
-    await this.loadItems();
+    await this.loadProfile();
     this.isLoading = false;
+    this.loadPinnedItem();
   },
   methods: {
+    loadPinnedItem() {
+      for (let index = 0; index < this.items.length; index++) {
+        const item = this.items[index];
+        if (item.isPinned) {
+          this.pinnedItem = item;
+          return;
+        }
+      }
+    },
     loadItemImg(imgLoc) {
       return cl.image(imgLoc).src;
     },
-    async loadItems() {
+    async loadProfile() {
+      const influencerUsername = this.$route.params.influencerUsername;
+      this.influencerName = influencerUsername;
+
       const response = await fetch(
-        `http://localhost:8080/api/v1/item-ops/main-page-items/1`,
+        `http://localhost:8080/api/v1/item-ops/items/${influencerUsername}`,
         {
           method: "GET",
           headers: {
@@ -115,7 +167,7 @@ export default {
         this.errorMsg = "Something weng wrong - try again later!";
       } else {
         const data = await response.json();
-        this.items = data.item;
+        this.items = data.items;
       }
     },
   },
@@ -123,5 +175,5 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "./Main.module.scss";
+@import "./InfluencerPage.module.scss";
 </style>

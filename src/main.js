@@ -9,15 +9,19 @@ import BalmUIPlus from "balm-ui-plus"; // BalmJS Team Material Components
 import "balm-ui-css";
 import TheHeader from "./components/layout/TheHeader.vue";
 import TheFooter from "./components/layout/TheFooter.vue";
+import TheSidebar from "./components/layout/TheSidebar.vue";
 import BaseLogo from "./components/UI/BaseLogo.vue";
 import BaseCard from "./components/UI/BaseCard.vue";
+import LoadingSpinner from "./components/UI/LoadingSpinner.vue";
 
 const app = createApp(App);
 
 app.component("TheHeader", TheHeader);
 app.component("TheFooter", TheFooter);
+app.component("TheSidebar", TheSidebar);
 app.component("BaseLogo", BaseLogo);
 app.component("BaseCard", BaseCard);
+app.component("LoadingSpinner", LoadingSpinner);
 
 app.use(BalmUI);
 app.use(BalmUIPlus);

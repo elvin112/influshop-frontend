@@ -106,18 +106,20 @@
     .item-container {
       margin-top: 1rem;
       margin-bottom: 2rem;
-      display: flex;
-      flex-wrap: wrap;
-
+      // display: flex;
+      // flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: min-content min-content min-content min-content;
+      gap: 1rem;
       .item {
         transition: 200ms;
         &:hover {
           scale: 1.1;
         }
 
-        &:not(-last-child) {
-          margin-right: 0.9rem;
-        }
+        // &:not(-last-child) {
+        //   margin-right: 0.9rem;
+        // }
 
         display: flex;
         position: relative;
@@ -205,17 +207,17 @@
 
           &__availability {
             border: none;
-            background-color: var(--color-success--2);
+            // background-color: var(--color-success--2);
             font-family: "Montserrat", sans-serif;
             font-weight: 600;
             font-size: 0.7rem;
             line-height: 1.6;
-            color: white;
+            color: var(--color-grey-dark-1);
             padding: 0.2rem;
           }
 
           .soldOut {
-            background-color: red;
+            color: var(--color-grey-dark-1);
           }
         }
 
@@ -225,11 +227,16 @@
           margin-left: auto;
           margin-right: auto;
           margin-bottom: 0.67rem;
-
+          background-color: black;
+          box-shadow: none;
           padding: 0.1rem;
-
+          border-radius: 5px;
           font-family: "Montserrat", sans-serif;
           font-weight: 600;
+
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.502);
+          }
         }
       }
     }

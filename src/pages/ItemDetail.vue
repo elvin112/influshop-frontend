@@ -382,7 +382,7 @@ export default {
         this.itemComments = data.item.comments;
         this.averageStars = parseFloat(data.item.averageStars).toFixed(2);
         if (this.averageStars === "NaN") {
-          this.averageStars = 0;
+          this.averageStars = "";
         }
         this.loadImages();
       }

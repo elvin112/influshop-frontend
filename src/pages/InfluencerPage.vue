@@ -36,9 +36,9 @@
       <router-link
         class="pinned-item-router"
         :to="
-          pinnedItem.type === 'itemGroup'
-            ? '/itemGroupDetail/' + pinnedItem.id
-            : '/itemDetail/' + pinnedItem.id
+          pinnedItem?.type === 'itemGroup'
+            ? '/itemGroupDetail/' + pinnedItem?.id
+            : '/itemDetail/' + pinnedItem?.id
         "
       >
         <div class="pinned-item mb-sm" v-if="pinnedItem">

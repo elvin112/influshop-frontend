@@ -227,16 +227,16 @@
           margin-left: auto;
           margin-right: auto;
           margin-bottom: 0.67rem;
-          background-color: black;
-          box-shadow: none;
+          // background-color: black;
+          // box-shadow: none;
           padding: 0.1rem;
           border-radius: 5px;
           font-family: "Montserrat", sans-serif;
           font-weight: 600;
 
-          &:hover {
-            background-color: rgba(0, 0, 0, 0.502);
-          }
+          // &:hover {
+          //   background-color: rgba(0, 0, 0, 0.502);
+          // }
         }
       }
     }

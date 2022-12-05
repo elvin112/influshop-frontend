@@ -130,6 +130,7 @@ export default {
     };
   },
   async mounted() {
+    window.scrollTo(0, 0);
     this.isLoading = true;
     this.errorMsg = null;
     await this.loadProfile();
@@ -164,7 +165,7 @@ export default {
       );
 
       if (!response.ok) {
-        this.errorMsg = "Something weng wrong - try again later!";
+        this.errorMsg = "Something went wrong - try again later!";
       } else {
         const data = await response.json();
         this.items = data.items;

@@ -1,5 +1,5 @@
 <template>
-  <h1>Influshop</h1>
+  <router-link to="/"><h1>Influshop</h1></router-link>
 </template>
 
 <style scoped lang="scss">

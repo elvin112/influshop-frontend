@@ -27,6 +27,12 @@
           </span>
 
           <div class="item-info">
+            <p class="item-info__influencer-link">
+              by
+              <router-link :to="'/influencer/' + item.influencerName"
+                >{{ item.influencerName }}
+              </router-link>
+            </p>
             <div class="item-info__title-stars">
               <p class="item-info__title">{{ item.name }}</p>
               <span class="item-info__star">
@@ -60,6 +66,9 @@
             >View in Detail</router-link
           >
         </div>
+        <span v-if="isLoading" class="error-msg">
+          <LoadingSpinner class="color-primary-3"
+        /></span>
       </div>
     </div>
   </div>
@@ -74,12 +83,6 @@ var cl = new Cloudinary({
   secure: true,
 });
 
-window.onscroll = function (ev) {
-  if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-    console.log("end");
-  }
-};
-
 export default {
   data() {
     return {
@@ -87,22 +90,36 @@ export default {
       errorMsg: "",
       items: [],
       influencerName: null,
-      itemImages: [],
+      currentPage: 1,
     };
   },
+  created() {},
+
   async mounted() {
     this.isLoading = true;
     this.errorMsg = null;
     await this.loadItems();
     this.isLoading = false;
+    window.addEventListener("scroll", this.loadNewItems);
   },
   methods: {
+    async loadNewItems(ev) {
+      let sendRequest = false;
+      window.onscroll = (ev) => {
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+          this.loadItems();
+        }
+      };
+      if (sendRequest) {
+        await this.loadItems();
+      }
+    },
     loadItemImg(imgLoc) {
       return cl.image(imgLoc).src;
     },
     async loadItems() {
       const response = await fetch(
-        `http://localhost:8080/api/v1/item-ops/main-page-items/1`,
+        `http://localhost:8080/api/v1/item-ops/main-page-items/${this.currentPage}`,
         {
           method: "GET",
           headers: {
@@ -115,7 +132,17 @@ export default {
         this.errorMsg = "Something weng wrong - try again later!";
       } else {
         const data = await response.json();
-        this.items = data.item;
+        if (this.currentPage >= 2) {
+          if (data.item.length !== 0) {
+            this.items = this.items.concat(data.item);
+            this.currentPage++;
+            return;
+          }
+        }
+        if (this.currentPage === 1) {
+          this.items = data.item;
+          this.currentPage++;
+        }
       }
     },
   },

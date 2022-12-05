@@ -77,7 +77,23 @@
           display: grid;
           grid-template-rows: 1fr 1fr;
           padding: 0.25rem 0.5rem;
-
+          &__influencer-link {
+            font-family: "Montserrat", sans-serif;
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: var(--color-primary--2);
+            a {
+              color: var(--color-grey-dark-1);
+              font-family: "Montserrat", sans-serif;
+              font-weight: 600;
+              font-size: 0.7rem;
+              text-decoration: none;
+            }
+            a:hover {
+              color: var(--color-primary);
+              text-decoration: none;
+            }
+          }
           &__star {
             font-family: "Montserrat", sans-serif;
             font-weight: 600;
@@ -147,15 +163,15 @@
           margin-bottom: 0.67rem;
 
           padding: 0.1rem;
-          background-color: black;
           border-radius: 5px;
-          box-shadow: none;
+          // background-color: black;
+          // box-shadow: none;
           font-family: "Montserrat", sans-serif;
           font-weight: 600;
 
-          &:hover {
-            background-color: rgba(0, 0, 0, 0.502);
-          }
+          // &:hover {
+          //   background-color: rgba(0, 0, 0, 0.502);
+          // }
         }
       }
     }

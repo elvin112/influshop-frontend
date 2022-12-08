@@ -6,11 +6,13 @@ import rootGetters from "./getters.js";
 
 import authModule from "./modules/auth/index.js";
 import influencerModule from "./modules/influencer/index.js";
+import cartModule from "./modules/cart/index.js";
 
 const store = createStore({
   modules: {
     auth: authModule,
     influencer: influencerModule,
+    cart: cartModule,
   },
   state() {
     return {};

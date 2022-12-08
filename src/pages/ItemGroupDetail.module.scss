@@ -99,7 +99,7 @@
       // align-items: flex-end;
       &__extraFeatures {
         display: grid;
-
+        align-items: baseline;
         grid-template-rows: min-content 1fr;
         gap: 1rem;
         .extraFeatuers-title {

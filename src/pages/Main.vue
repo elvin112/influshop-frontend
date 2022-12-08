@@ -93,7 +93,6 @@ export default {
       currentPage: 1,
     };
   },
-  created() {},
 
   async mounted() {
     this.isLoading = true;

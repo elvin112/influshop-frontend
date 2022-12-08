@@ -1,6 +1,11 @@
 <template>
   <TheHeader />
-
+  <Transition>
+    <ErrorMsg v-if="showErrMsg" :msg="errMsg" />
+  </Transition>
+  <Transition>
+    <SimpleAlertMsg v-if="showAlertMsg" :msg="alertMsg" />
+  </Transition>
   <div class="wrapper mt-sm">
     <ItemReport v-if="bringItemReportCard" :itemId="itemId" />
     <CommentReport v-if="bringCommentReportCard" :commentId="commentId" />
@@ -184,14 +189,12 @@
               >+</span
             >
           </div>
+          &nbsp;&nbsp;out of {{ itemLeft }} units
         </div>
-
         <div class="order-specification__buttons mt-sm">
-          <button class="btn btn--outline disabled-button" disabled>
+          <!-- <button class="btn btn--outline">Add to Cart</button> -->
+          <button @click="addToCartHandler" class="btn btn--primary mb-sm">
             Add to Cart
-          </button>
-          <button class="btn btn--primary mb-sm disabled-button" disabled>
-            Buy Now
           </button>
         </div>
       </div>
@@ -296,11 +299,17 @@ export default {
       closeItemFeedbackPopup: this.closeItemFeedbackPopup,
       closeCommentDeletionPopup: this.closeCommentDeletionPopup,
       deleteComment: this.deleteComment,
+      closeErrMsg: this.closeErrMsg,
+      closeAlertMsg: this.closeAlertMsg,
     };
   },
 
   data() {
     return {
+      errMsg: "Something went wrong!",
+      alertMsg: "Process done!",
+      showErrMsg: false,
+      showAlertMsg: false,
       itemGroupName: null,
       itemGroupDescription: null,
       itemGroupImage: null,
@@ -312,6 +321,7 @@ export default {
       itemPrice: null,
       itemImages: null,
       itemQuantity: 1,
+      itemLeft: null,
       averageStars: 0,
       itemComments: [],
       isThumb1: true,
@@ -365,6 +375,47 @@ export default {
     },
   },
   methods: {
+    closeErrMsg() {
+      this.showErrMsg = false;
+    },
+    closeAlertMsg() {
+      this.showAlertMsg = false;
+    },
+    async addToCartHandler() {
+      if (this.itemLeft <= 0) {
+        return;
+      }
+      const payload = {
+        itemId: this.itemId,
+        quantity: this.itemQuantity,
+        isAddToCart: true,
+      };
+      try {
+        const response = await this.$store.dispatch(
+          "cart/addItemToCart",
+          payload
+        );
+
+        if (!response.ok) {
+          let errMsg = null;
+          errMsg = await response.json();
+          throw errMsg;
+        } else {
+          // alert("Item added!");
+          this.alertMsg = "Item added to cart";
+          this.showAlertMsg = true;
+          setTimeout(() => {
+            this.showAlertMsg = false;
+          }, 5000);
+        }
+      } catch (error) {
+        this.errMsg = error?.message || "Item could not be added!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
+    },
     async deleteComment() {
       const response = await fetch(
         `http://localhost:8080/api/v1/comment/${this.commentId}`,
@@ -521,6 +572,7 @@ export default {
         this.itemPrice = data.item.price;
         this.itemImages = data.item.images;
         this.itemComments = data.item.comments;
+        this.itemLeft = data.item.quantity;
         this.averageStars = parseFloat(data.item.averageStars).toFixed(2);
         if (this.averageStars === "NaN") {
           this.averageStars = 0;
@@ -535,6 +587,7 @@ export default {
       this.itemPrice = null;
       this.itemImages = null;
       this.itemComments = null;
+      this.itemLeft = null;
       this.averageStars = null;
       this.loadGroupImage();
       this.loadExtraFeatures();
@@ -858,6 +911,9 @@ export default {
       }
     },
     increaseQuantity() {
+      if (this.itemQuantity >= this.itemLeft) {
+        return;
+      }
       this.itemQuantity++;
     },
     decreaseQuantity() {

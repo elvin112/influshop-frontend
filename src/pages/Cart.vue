@@ -2,10 +2,12 @@
   <header>
     <TheHeader />
   </header>
-  <Transition v-if="showErrMsg">
-    <ErrorMsg :msg="errMsg" />
+  <Transition>
+    <ErrorMsg v-if="showErrMsg" :msg="errMsg" />
   </Transition>
-
+  <Transition>
+    <SimpleAlertMsg v-if="showAlertMsg" :msg="alertMsg" />
+  </Transition>
   <div class="wrapper">
     <div class="process-form">
       <div class="path-indicator">
@@ -53,7 +55,18 @@
       <hr class="mt-md" />
 
       <!-- DELIVERY INFORMATION -->
-      <div class="process-form__stage mt-sm" v-show="currentStage === 1">
+      <div
+        v-show="cartLength <= 0 && currentStage !== 3"
+        class="empty-graphic-container"
+      >
+        <span class="empty-graphic">
+          <img src="../assets/img/SVG/16.-List-is-Empty.svg" alt="" />
+        </span>
+      </div>
+      <div
+        class="process-form__stage mt-sm"
+        v-show="currentStage === 1 && cartLength > 0"
+      >
         <p class="stage-title">Delivery Information</p>
         <div class="useSavedAddressChk">
           <p class="useSavedAddressChk__title">Use saved address</p>
@@ -180,7 +193,42 @@
       <!-- PAYMENT INFORMATION -->
       <div class="process-form__stage mt-sm" v-show="currentStage === 2">
         <p class="stage-title">Payment Details</p>
-        <form @submit.prevent="submitPaymentHandler" class="stage-form mt-md">
+        <div class="useSavedAddressChk">
+          <p class="useSavedAddressChk__title">Use saved card</p>
+          <input class="checkbox" type="checkbox" v-model="useSavedCardChck" />
+        </div>
+        <div>
+          <form @submit.prevent="submitPaymentHandler">
+            <select
+              class="save-address-select"
+              name=""
+              id=""
+              :disabled="!useSavedCardChck"
+              v-model="selectedSavedCard"
+              required
+            >
+              <option
+                :key="address.id"
+                v-for="(card, index) in userCreditCards"
+                :value="index"
+              >
+                {{ card.creditCardName }}
+              </option>
+            </select>
+            <button
+              v-show="useSavedCardChck"
+              :class="{ 'move-btn-down': useSavedCardChck }"
+              class="btn btn--primary form-control__submitCard mt-sm"
+            >
+              Purchase Product
+            </button>
+          </form>
+        </div>
+        <form
+          @submit.prevent="submitPaymentHandler"
+          class="stage-form mt-md"
+          v-show="!useSavedCardChck"
+        >
           <div class="form-control">
             <label for="cdName">Card Name</label>
             <input
@@ -251,7 +299,10 @@
             <label for="saveCard">Save Card Details</label>
           </div>
 
-          <button class="btn btn--primary form-control__submitCard mt-sm">
+          <button
+            class="btn btn--primary form-control__submitCard mt-sm"
+            :class="{ 'move-btn-down': useSavedCardChck }"
+          >
             Purchase Product
           </button>
         </form>
@@ -311,56 +362,30 @@
       <p class="your-order__title">Your Order</p>
       <hr />
       <div class="cart-content-container">
-        <div class="cart-content mt-sm">
-          <div class="cart-content__item-img">
-            <img src="../assets/img/no-img-placeholder.jpeg" alt="" />
-          </div>
-          <div class="cart-content__item-info">
-            <div class="title-icon">
-              <p>Adidas Shoes</p>
-
-              <span class="delete-item">
-                <svg class="delete-icon-bin">
-                  <use xlink:href="../assets/img/sprite.svg#icon-bin" />
-                </svg>
-              </span>
-            </div>
-            <div class="quantityWprice">
-              <div class="quantityWprice__quantity">
-                <span
-                  class="quantityWprice__quantity--1"
-                  @click="
-                    {
-                    }
-                  "
-                  >-</span
-                >
-                <span>1</span>
-                <span
-                  class="quantityWprice__quantity--3"
-                  @click="
-                    {
-                    }
-                  "
-                  >+</span
-                >
-              </div>
-
-              <div class="quantityWprice__price">
-                <p class="price-text">$89.99</p>
-              </div>
-            </div>
-          </div>
+        <div v-show="cartLength <= 0" class="cart-is-empty">
+          <h2>Your cart is empty</h2>
+          <p>
+            To make an easy and quick purchase, add products to your shopping
+            cart.
+          </p>
         </div>
-        <div class="cart-content mt-sm">
+
+        <div class="cart-content mt-sm" v-for="item in userCart" :key="item.id">
           <div class="cart-content__item-img">
-            <img src="../assets/img/no-img-placeholder.jpeg" alt="" />
+            <img
+              :src="loadItemImg(item.image)"
+              alt="An item."
+              class="item__picture"
+            />
           </div>
           <div class="cart-content__item-info">
             <div class="title-icon">
-              <p>Adidas Shoes</p>
+              <p>{{ item.itemName }}</p>
 
-              <span class="delete-item">
+              <span
+                class="delete-item"
+                @click="removeItemFromCart(item.id, item.quantity)"
+              >
                 <svg class="delete-icon-bin">
                   <use xlink:href="../assets/img/sprite.svg#icon-bin" />
                 </svg>
@@ -370,142 +395,13 @@
               <div class="quantityWprice__quantity">
                 <span
                   class="quantityWprice__quantity--1"
-                  @click="
-                    {
-                    }
-                  "
+                  @click="decreaseItemQuantity(item.id, item.quantity)"
                   >-</span
                 >
-                <span>1</span>
+                <span>{{ item.quantity }}</span>
                 <span
                   class="quantityWprice__quantity--3"
-                  @click="
-                    {
-                    }
-                  "
-                  >+</span
-                >
-              </div>
-
-              <div class="quantityWprice__price">
-                <p class="price-text">$89.99</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="cart-content mt-sm">
-          <div class="cart-content__item-img">
-            <img src="../assets/img/no-img-placeholder.jpeg" alt="" />
-          </div>
-          <div class="cart-content__item-info">
-            <div class="title-icon">
-              <p>Adidas Shoes</p>
-
-              <span class="delete-item">
-                <svg class="delete-icon-bin">
-                  <use xlink:href="../assets/img/sprite.svg#icon-bin" />
-                </svg>
-              </span>
-            </div>
-            <div class="quantityWprice">
-              <div class="quantityWprice__quantity">
-                <span
-                  class="quantityWprice__quantity--1"
-                  @click="
-                    {
-                    }
-                  "
-                  >-</span
-                >
-                <span>1</span>
-                <span
-                  class="quantityWprice__quantity--3"
-                  @click="
-                    {
-                    }
-                  "
-                  >+</span
-                >
-              </div>
-
-              <div class="quantityWprice__price">
-                <p class="price-text">$89.99</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="cart-content mt-sm">
-          <div class="cart-content__item-img">
-            <img src="../assets/img/no-img-placeholder.jpeg" alt="" />
-          </div>
-          <div class="cart-content__item-info">
-            <div class="title-icon">
-              <p>Adidas Shoes</p>
-
-              <span class="delete-item">
-                <svg class="delete-icon-bin">
-                  <use xlink:href="../assets/img/sprite.svg#icon-bin" />
-                </svg>
-              </span>
-            </div>
-            <div class="quantityWprice">
-              <div class="quantityWprice__quantity">
-                <span
-                  class="quantityWprice__quantity--1"
-                  @click="
-                    {
-                    }
-                  "
-                  >-</span
-                >
-                <span>1</span>
-                <span
-                  class="quantityWprice__quantity--3"
-                  @click="
-                    {
-                    }
-                  "
-                  >+</span
-                >
-              </div>
-
-              <div class="quantityWprice__price">
-                <p class="price-text">$89.99</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="cart-content mt-sm">
-          <div class="cart-content__item-img">
-            <img src="../assets/img/no-img-placeholder.jpeg" alt="" />
-          </div>
-          <div class="cart-content__item-info">
-            <div class="title-icon">
-              <p>Adidas Shoes</p>
-
-              <span class="delete-item">
-                <svg class="delete-icon-bin">
-                  <use xlink:href="../assets/img/sprite.svg#icon-bin" />
-                </svg>
-              </span>
-            </div>
-            <div class="quantityWprice">
-              <div class="quantityWprice__quantity">
-                <span
-                  class="quantityWprice__quantity--1"
-                  @click="
-                    {
-                    }
-                  "
-                  >-</span
-                >
-                <span>1</span>
-                <span
-                  class="quantityWprice__quantity--3"
-                  @click="
-                    {
-                    }
-                  "
+                  @click="increaseItemQuantity(item.id, item.quantity)"
                   >+</span
                 >
               </div>
@@ -542,6 +438,12 @@
 </template>
 
 <script>
+import { isProxy, toRaw } from "vue";
+import { Cloudinary } from "cloudinary-core"; // If your code is for ES6 or higher
+var cl = new Cloudinary({
+  cloud_name: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
+  secure: true,
+});
 export default {
   provide() {
     return {
@@ -549,11 +451,124 @@ export default {
     };
   },
 
-  mounted() {
+  async mounted() {
     this.fetchUserAddresses();
+    this.fetchUserCards();
+  },
+  computed: {
+    userCart() {
+      return this.$store.getters["cart/userCart"];
+    },
+
+    cartLength() {
+      return this.$store.getters["cart/cartLength"];
+    },
   },
 
   methods: {
+    async increaseItemQuantity(id, quantity) {
+      try {
+        const response = await this.$store.dispatch("cart/increaseQuantity", {
+          id: id,
+          quantity: quantity,
+        });
+
+        if (!response.ok) {
+          let errMsg = null;
+          errMsg = await response.json();
+          console.log(errMsg);
+          throw errMsg;
+        } else {
+          //
+        }
+      } catch (error) {
+        this.errMsg = "Item's quantity could not be changed!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
+    },
+    async decreaseItemQuantity(id, quantity) {
+      try {
+        const response = await this.$store.dispatch("cart/decreaseQuantity", {
+          id: id,
+          quantity: quantity,
+        });
+
+        if (!response.ok) {
+          let errMsg = null;
+          errMsg = await response.json();
+          console.log(errMsg);
+          throw errMsg;
+        } else {
+          //
+        }
+      } catch (error) {
+        this.errMsg = "Item's quantity could not be changed!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
+    },
+    async removeItemFromCart(id, quantity) {
+      try {
+        const response = await this.$store.dispatch("cart/removeItem", {
+          id: id,
+          quantity: quantity,
+        });
+
+        if (!response.ok) {
+          let errMsg = null;
+          errMsg = await response.json();
+          console.log(errMsg);
+          throw errMsg;
+        } else {
+          // alert("Item added!");
+          this.alertMsg = "Item removed from the cart";
+          this.showAlertMsg = true;
+          setTimeout(() => {
+            this.showAlertMsg = false;
+          }, 5000);
+        }
+      } catch (error) {
+        this.errMsg = "Item could not be removed!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
+    },
+    loadItemImg(imgLoc) {
+      return cl.image(imgLoc).src;
+    },
+    async fetchUserCards() {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/v1/settings/credit-card`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + this.$store.getters["auth/token"], //accessToken contain bearer value.
+            },
+          }
+        );
+        if (!response.ok) {
+          throw Error();
+        } else {
+          const data = await response.json();
+          this.userCreditCards = data.creditCards;
+        }
+      } catch (error) {
+        this.errMsg = "Credit cards could not be fetched!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
+    },
     async fetchUserAddresses() {
       try {
         const response = await fetch(
@@ -595,7 +610,61 @@ export default {
         expirationDate: this.cdExpiration,
         cvv: this.cdCvv,
       };
-      if (this.svCardChecbox) {
+      let addressData = null;
+      if (this.useSavedAddressChck) {
+        const tempAddressData = this.userAddresses[this.selectedSavedAdress];
+        addressData = {
+          addressName: tempAddressData.addressName,
+          address: tempAddressData.address,
+          country: tempAddressData.country,
+          state: tempAddressData.state,
+          city: tempAddressData.city,
+          street: tempAddressData.street,
+          zip: tempAddressData.zip,
+        };
+      } else {
+        addressData = {
+          addressName: this.addressName,
+          address: this.address,
+          country: this.country,
+          state: this.state,
+          city: this.city,
+          street: this.street,
+          zip: this.zipcode,
+        };
+      }
+      if (this.useSavedCardChck) {
+        // send checkout request with saved credit-card
+        const payload = {
+          creditCardId: this.userCreditCards[this.selectedSavedCard].id,
+          shippingAddress: addressData,
+        };
+
+        try {
+          const response = await fetch(
+            `http://localhost:8080/api/v1/e-commerce/checkout-with-saved-credit-card`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + this.$store.getters["auth/token"], //accessToken contain bearer value.
+              },
+              body: JSON.stringify(payload),
+            }
+          );
+          if (!response.ok) {
+            throw Error();
+          } else {
+            const data = await response.json();
+            this.paymentfailed = false;
+            this.$store.dispatch("cart/fetchUserCart");
+            this.moveToStage(3);
+          }
+        } catch (error) {
+          this.paymentfailed = true;
+          this.moveToStage(3);
+        }
+      } else if (this.svCardChecbox) {
         try {
           const response = await fetch(
             `http://localhost:8080/api/v1/settings/credit-card`,
@@ -610,6 +679,7 @@ export default {
           );
           if (!response.ok) {
             const data = response.json();
+
             throw Error();
           } else {
             const data = await response.json();
@@ -617,15 +687,7 @@ export default {
             // send checkout request with saved credit-card
             const payload = {
               creditCardId: data.creditCardId,
-              shippingAddress: {
-                addressName: this.addressName,
-                address: this.address,
-                country: this.country,
-                state: this.state,
-                city: this.city,
-                street: this.street,
-                zip: this.zipcode,
-              },
+              shippingAddress: addressData,
             };
             try {
               const response = await fetch(
@@ -645,6 +707,7 @@ export default {
               } else {
                 const data = await response.json();
                 this.paymentfailed = false;
+                this.$store.dispatch("cart/fetchUserCart");
                 this.moveToStage(3);
               }
             } catch (error) {
@@ -661,17 +724,9 @@ export default {
           }, 5000);
         }
       } else {
-        // send checkout request without saved card
+        // send checkout request without saving card
         const payload = {
-          shippingAddress: {
-            addressName: this.addressName,
-            address: this.address,
-            country: this.country,
-            state: this.state,
-            city: this.city,
-            street: this.street,
-            zip: this.zipcode,
-          },
+          shippingAddress: addressData,
           creditCard: {
             cardNumber: this.cdNumber,
             cardHolderName: this.cdHolderName,
@@ -679,6 +734,7 @@ export default {
             cvv: this.cdCvv,
           },
         };
+
         try {
           const response = await fetch(
             `http://localhost:8080/api/v1/e-commerce/checkout`,
@@ -692,9 +748,11 @@ export default {
             }
           );
           if (!response.ok) {
+            console.log(await response.json());
             throw Error();
           } else {
             this.paymentfailed = false;
+            this.$store.dispatch("cart/fetchUserCart");
             this.moveToStage(3);
           }
         } catch (error) {
@@ -737,7 +795,6 @@ export default {
       } catch (error) {
         this.errMsg = "Address could not be saved!";
         this.showErrMsg = true;
-        this.moveToStage(2);
         setTimeout(() => {
           this.showErrMsg = false;
         }, 5000);
@@ -747,7 +804,6 @@ export default {
       switch (stageNum) {
         case 1:
           if (this.addressCheckbox) {
-            console.log("running");
             this.fetchUserAddresses();
             this.selectedSavedAdress = this.userAddresses.length;
             this.useSavedAddressChck = true;
@@ -756,6 +812,12 @@ export default {
           this.currentStage = 1;
           break;
         case 2:
+          if (this.svCardChecbox) {
+            this.fetchUserCards();
+            this.selectedSavedCard = this.userCreditCards.length;
+            this.useSavedCardChck = true;
+            this.svCardChecbox = false;
+          }
           this.currentStage = 2;
           break;
         case 3:
@@ -766,6 +828,8 @@ export default {
   },
   data() {
     return {
+      alertMsg: "Process done!",
+      showAlertMsg: false,
       currentStage: 1,
       addressName: "",
       address: "",
@@ -785,8 +849,11 @@ export default {
       showErrMsg: false,
       paymentfailed: null,
       useSavedAddressChck: false,
+      useSavedCardChck: false,
       userAddresses: [],
+      userCreditCards: [],
       selectedSavedAdress: "0",
+      selectedSavedCard: "0",
     };
   },
 };

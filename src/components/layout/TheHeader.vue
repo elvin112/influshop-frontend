@@ -1,6 +1,6 @@
 <template>
   <div class="header-wrapper">
-    <div class="header-1">
+    <!-- <div class="header-1">
       <div class="download-app">
         <svg class="download-app__icon">
           <use xlink:href="../../assets/img/sprite.svg#icon-mobile" />
@@ -22,10 +22,44 @@
           </ul>
         </nav>
       </div>
+    </div> -->
+    <div class="header-2">
+      <BaseLogo />
+      <nav class="header-nav">
+        <ul>
+          <router-link to="/cart">
+            <li class="header-nav__cart" v-if="showCart">
+              <svg class="cart-icon">
+                <use
+                  xlink:href="../../assets/img/sprite.svg#icon-shopping_bag"
+                />
+              </svg>
+              <span class="cart-icon__item-count" v-show="cartLength > 0">{{
+                cartLength
+              }}</span>
+            </li>
+          </router-link>
+        </ul>
+      </nav>
     </div>
-    <div class="header-2"><BaseLogo /></div>
   </div>
 </template>
+
+<script>
+export default {
+  computed: {
+    showCart() {
+      if (this.$store.getters["auth/token"]) {
+        if (this.$store.getters["auth/isInfluencer"] === "false") return true;
+      }
+      return false;
+    },
+    cartLength() {
+      return this.$store.getters["cart/cartLength"];
+    },
+  },
+};
+</script>
 
 <style scoped lang="scss">
 @import "TheHeader.module.scss";

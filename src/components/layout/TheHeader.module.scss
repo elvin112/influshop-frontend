@@ -50,4 +50,32 @@
   height: 65px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  .header-nav {
+    justify-content: flex-end;
+
+    &__cart {
+      .cart-icon {
+        width: 2.8rem;
+        height: 2.8rem;
+        fill: transparent;
+        stroke: var(--color-grey-dark-1);
+
+        &__item-count {
+          background-color: var(--color-primary);
+          color: white;
+          width: 1.2rem;
+          text-align: center;
+          display: inline-block;
+          border-radius: 90%;
+          transform: translate(-60%);
+          z-index: 99;
+        }
+      }
+    }
+  }
+}
+
+ul {
+  list-style: none;
 }

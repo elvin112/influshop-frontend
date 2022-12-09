@@ -152,7 +152,11 @@
 
         <div class="order-specification__buttons mt-sm">
           <!-- <button class="btn btn--outline">Add to Cart</button> -->
-          <button @click="addToCartHandler" class="btn btn--primary mb-sm">
+          <button
+            :disabled="itemLeft <= 0"
+            @click="addToCartHandler"
+            class="btn btn--primary mb-sm"
+          >
             Add to Cart
           </button>
         </div>
@@ -781,5 +785,13 @@ export default {
 
 .hovered {
   color: var(--color-primary);
+}
+
+button:disabled,
+button[disabled] {
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+  box-shadow: none;
 }
 </style>

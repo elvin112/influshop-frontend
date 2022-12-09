@@ -205,6 +205,7 @@
                 class="form-input--primary mb-sm content-name"
                 placeholder="e.g., red, blue, green"
                 ref="content-name-first-row"
+                required
               />
             </div>
           </div>
@@ -343,6 +344,7 @@ export default {
                 id="content-name"
                 class="form-input--primary content-name"
                 placeholder="e.g., red, blue, green"
+                required
                 value=${itemGroupExtraFeatures[this.listOfProperties[index]]}
                 />
            

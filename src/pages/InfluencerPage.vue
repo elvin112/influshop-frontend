@@ -64,7 +64,21 @@
             class="item__picture"
           />
 
-          <span class="item__add-to-favorite">
+          <span
+            v-show="item.isFavorite"
+            class="item__add-to-favorite"
+            @click="addItemToFavorites(item.id, false)"
+          >
+            <svg class="heart-icon filled">
+              <use xlink:href="../assets/img/sprite.svg#icon-heart" />
+            </svg>
+          </span>
+
+          <span
+            class="item__add-to-favorite"
+            v-show="!item.isFavorite"
+            @click="addItemToFavorites(item.id, true)"
+          >
             <svg class="heart-icon">
               <use xlink:href="../assets/img/sprite.svg#icon-heart" />
             </svg>
@@ -138,6 +152,54 @@ export default {
     this.loadPinnedItem();
   },
   methods: {
+    async addItemToFavorites(id, mode) {
+      if (this.$store.getters["auth/token"]) {
+        if (this.$store.getters["auth/isInfluencer"] === "true") {
+          return;
+        }
+      } else {
+        return;
+      }
+      const payload = {
+        itemId: id,
+        isAddToFavorite: mode,
+      };
+      try {
+        const response = await this.$store.dispatch(
+          "favorite/addItemToFavorites",
+          payload
+        );
+
+        if (!response.ok) {
+          let errMsg = null;
+          errMsg = await response.json();
+          throw errMsg;
+        } else {
+          // alert("Item added!");
+          if (mode) {
+            this.alertMsg = "Item added to favorites";
+          } else {
+            this.alertMsg = "Item removed from favorites";
+          }
+          this.showAlertMsg = true;
+          for (let index = 0; index < this.items.length; index++) {
+            if (this.items[index].id === id) {
+              console.log(this.items[index]);
+              this.items[index].isFavorite = !this.items[index].isFavorite;
+            }
+          }
+          setTimeout(() => {
+            this.showAlertMsg = false;
+          }, 5000);
+        }
+      } catch (error) {
+        this.errMsg = error?.message || "Item could not be added!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
+    },
     loadPinnedItem() {
       for (let index = 0; index < this.items.length; index++) {
         const item = this.items[index];
@@ -154,15 +216,32 @@ export default {
       const influencerUsername = this.$route.params.influencerUsername;
       this.influencerName = influencerUsername;
 
-      const response = await fetch(
-        `http://localhost:8080/api/v1/item-ops/items/${influencerUsername}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
+      let response = null;
+      if (this.$store.getters["auth/token"]) {
+        if (this.$store.getters["auth/isInfluencer"] === "false") {
+          response = await fetch(
+            `http://localhost:8080/api/v1/item-ops/items/${influencerUsername}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + this.$store.getters["auth/token"],
+              },
+            }
+          );
         }
-      );
+      }
+      if (response === null) {
+        response = await fetch(
+          `http://localhost:8080/api/v1/item-ops/items/${influencerUsername}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
 
       if (!response.ok) {
         this.errorMsg = "Something went wrong - try again later!";

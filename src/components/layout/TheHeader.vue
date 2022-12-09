@@ -27,6 +27,18 @@
       <BaseLogo />
       <nav class="header-nav">
         <ul>
+          <router-link to="/favorites">
+            <li class="header-nav__favorite" v-if="showCart">
+              <svg class="favorite-icon">
+                <use xlink:href="../../assets/img/sprite.svg#icon-heart" />
+              </svg>
+              <span
+                class="favorite-icon__item-count"
+                v-show="favoriteLength > 0"
+                >{{ favoriteLength }}</span
+              >
+            </li>
+          </router-link>
           <router-link to="/cart">
             <li class="header-nav__cart" v-if="showCart">
               <svg class="cart-icon">
@@ -53,6 +65,9 @@ export default {
         if (this.$store.getters["auth/isInfluencer"] === "false") return true;
       }
       return false;
+    },
+    favoriteLength() {
+      return this.$store.getters["favorite/favoriteLength"];
     },
     cartLength() {
       return this.$store.getters["cart/cartLength"];

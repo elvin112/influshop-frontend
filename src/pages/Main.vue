@@ -2,7 +2,12 @@
   <header>
     <TheHeader />
   </header>
-
+  <Transition>
+    <ErrorMsg v-if="showErrMsg" :msg="errMsg" />
+  </Transition>
+  <Transition>
+    <SimpleAlertMsg v-if="showAlertMsg" :msg="alertMsg" />
+  </Transition>
   <div class="wrapper">
     <TheSidebar />
     <span v-if="isLoading" class="error-msg">
@@ -20,7 +25,20 @@
             class="item__picture"
           />
 
-          <span class="item__add-to-favorite">
+          <span
+            v-show="item.isFavorite"
+            class="item__add-to-favorite"
+            @click="addItemToFavorites(item.id, false)"
+          >
+            <svg class="heart-icon filled">
+              <use xlink:href="../assets/img/sprite.svg#icon-heart" />
+            </svg>
+          </span>
+          <span
+            v-show="!item.isFavorite"
+            class="item__add-to-favorite"
+            @click="addItemToFavorites(item.id, true)"
+          >
             <svg class="heart-icon">
               <use xlink:href="../assets/img/sprite.svg#icon-heart" />
             </svg>
@@ -84,6 +102,12 @@ var cl = new Cloudinary({
 });
 
 export default {
+  provide() {
+    return {
+      closeErrMsg: this.closeErrMsg,
+      closeAlertMsg: this.closeAlertMsg,
+    };
+  },
   data() {
     return {
       isLoading: true,
@@ -91,6 +115,10 @@ export default {
       items: [],
       influencerName: null,
       currentPage: 1,
+      alertMsg: "Process done!",
+      showAlertMsg: false,
+      errMsg: "Something went wrong!",
+      showErrMsg: false,
     };
   },
 
@@ -102,6 +130,61 @@ export default {
     window.addEventListener("scroll", this.loadNewItems);
   },
   methods: {
+    closeErrMsg() {
+      this.showErrMsg = false;
+    },
+    closeAlertMsg() {
+      this.showAlertMsg = false;
+    },
+    async addItemToFavorites(id, mode) {
+      if (this.$store.getters["auth/token"]) {
+        if (this.$store.getters["auth/isInfluencer"] === "true") {
+          return;
+        }
+      } else {
+        return;
+      }
+      const payload = {
+        itemId: id,
+        isAddToFavorite: mode,
+      };
+      try {
+        const response = await this.$store.dispatch(
+          "favorite/addItemToFavorites",
+          payload
+        );
+
+        if (!response.ok) {
+          let errMsg = null;
+          errMsg = await response.json();
+          throw errMsg;
+        } else {
+          // alert("Item added!");
+          if (mode) {
+            this.alertMsg = "Item added to favorites";
+          } else {
+            this.alertMsg = "Item removed from favorites";
+          }
+          this.showAlertMsg = true;
+          for (let index = 0; index < this.items.length; index++) {
+            if (this.items[index].id === id) {
+              console.log(this.items[index]);
+              this.items[index].isFavorite = !this.items[index].isFavorite;
+            }
+          }
+          setTimeout(() => {
+            this.showAlertMsg = false;
+          }, 5000);
+        }
+      } catch (error) {
+        this.errMsg = error?.message || "Item could not be added!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
+    },
+
     async loadNewItems(ev) {
       let sendRequest = false;
       window.onscroll = (ev) => {
@@ -117,20 +200,38 @@ export default {
       return cl.image(imgLoc).src;
     },
     async loadItems() {
-      const response = await fetch(
-        `http://localhost:8080/api/v1/item-ops/main-page-items/${this.currentPage}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
+      let response = null;
+      if (this.$store.getters["auth/token"]) {
+        if (this.$store.getters["auth/isInfluencer"] === "false") {
+          response = await fetch(
+            `http://localhost:8080/api/v1/item-ops/main-page-items/${this.currentPage}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + this.$store.getters["auth/token"],
+              },
+            }
+          );
         }
-      );
+      }
+      if (response === null) {
+        response = await fetch(
+          `http://localhost:8080/api/v1/item-ops/main-page-items/${this.currentPage}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
 
       if (!response.ok) {
         this.errorMsg = "Something weng wrong - try again later!";
       } else {
         const data = await response.json();
+        console.log(data);
         if (this.currentPage >= 2) {
           if (data.item.length !== 0) {
             this.items = this.items.concat(data.item);

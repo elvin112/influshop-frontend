@@ -10,6 +10,7 @@ import ItemDetail from "../pages/ItemDetail.vue";
 import ItemGroupDetail from "../pages/ItemGroupDetail.vue";
 import InfluencerPage from "../pages/InfluencerPage.vue";
 import Cart from "../pages/Cart.vue";
+import Favorites from "../pages/Favorites.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -74,6 +75,11 @@ const router = createRouter({
       path: "/cart",
       name: "cart",
       component: Cart,
+    },
+    {
+      path: "/favorites",
+      name: "favorites",
+      component: Favorites,
     },
   ],
   linkActiveClass: "active",

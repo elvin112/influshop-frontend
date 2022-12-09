@@ -380,7 +380,9 @@
           </div>
           <div class="cart-content__item-info">
             <div class="title-icon">
-              <p>{{ item.itemName }}</p>
+              <router-link :to="'/itemDetail/' + item.id"
+                ><p>{{ item.itemName }}</p></router-link
+              >
 
               <span
                 class="delete-item"
@@ -448,6 +450,7 @@ export default {
   provide() {
     return {
       closeErrMsg: this.closeErrMsg,
+      closeAlertMsg: this.closeAlertMsg,
     };
   },
 
@@ -490,6 +493,9 @@ export default {
       }
     },
     async decreaseItemQuantity(id, quantity) {
+      if (quantity === 1) {
+        return;
+      }
       try {
         const response = await this.$store.dispatch("cart/decreaseQuantity", {
           id: id,
@@ -600,6 +606,9 @@ export default {
     },
     closeErrMsg() {
       this.showErrMsg = false;
+    },
+    closeAlertMsg() {
+      this.showAlertMsg = false;
     },
     async submitPaymentHandler() {
       let checkoutUrl = "";
@@ -830,6 +839,8 @@ export default {
     return {
       alertMsg: "Process done!",
       showAlertMsg: false,
+      errMsg: "Something went wrong!",
+      showErrMsg: false,
       currentStage: 1,
       addressName: "",
       address: "",
@@ -845,8 +856,6 @@ export default {
       cdExpiration: "",
       cdCvv: "",
       svCardChecbox: "",
-      errMsg: "Something went wrong!",
-      showErrMsg: false,
       paymentfailed: null,
       useSavedAddressChck: false,
       useSavedCardChck: false,

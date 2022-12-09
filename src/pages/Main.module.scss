@@ -66,6 +66,11 @@
             cursor: pointer;
             z-index: 99;
           }
+
+          .filled {
+            fill: red;
+            stroke: transparent;
+          }
         }
 
         &__picture {

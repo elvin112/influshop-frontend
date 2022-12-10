@@ -386,7 +386,7 @@
 
               <span
                 class="delete-item"
-                @click="removeItemFromCart(item.id, item.quantity)"
+                @click="removeItemFromCart(item.id, item.itemQuantity)"
               >
                 <svg class="delete-icon-bin">
                   <use xlink:href="../assets/img/sprite.svg#icon-bin" />
@@ -397,19 +397,22 @@
               <div class="quantityWprice__quantity">
                 <span
                   class="quantityWprice__quantity--1"
-                  @click="decreaseItemQuantity(item.id, item.quantity)"
+                  @click="decreaseItemQuantity(item.id, item.itemQuantity)"
                   >-</span
                 >
-                <span>{{ item.quantity }}</span>
+                <span>{{ item.itemQuantity }}</span>
                 <span
                   class="quantityWprice__quantity--3"
-                  @click="increaseItemQuantity(item.id, item.quantity)"
+                  @click="increaseItemQuantity(item.id, item.itemQuantity)"
                   >+</span
                 >
               </div>
 
               <div class="quantityWprice__price">
-                <p class="price-text">$89.99</p>
+                <p class="price-text">
+                  ${{ item.itemPrice * item.itemQuantity }}
+                </p>
+                <p class="price-text-perUnit">per unit ${{ item.itemPrice }}</p>
               </div>
             </div>
           </div>
@@ -420,7 +423,7 @@
         <hr />
         <span class="subtotal-shipping mb-sm mt-sm">
           <p class="subtotal-shipping__title">Subtotal</p>
-          <p class="subtotal-shipping__number">$778.00</p>
+          <p class="subtotal-shipping__number">${{ cartTotalPrice }}</p>
 
           <p class="subtotal-shipping__title">Shipping</p>
           <p class="subtotal-shipping__number">$0.00</p>
@@ -429,7 +432,7 @@
 
         <span class="final-price mt-sm">
           <p class="final-price__title">Total</p>
-          <p class="final-price__number">$778.00</p>
+          <p class="final-price__number">${{ cartTotalPrice }}</p>
         </span>
       </span>
     </div>
@@ -461,6 +464,9 @@ export default {
   computed: {
     userCart() {
       return this.$store.getters["cart/userCart"];
+    },
+    cartTotalPrice() {
+      return this.$store.getters["cart/cartTotalPrice"];
     },
 
     cartLength() {

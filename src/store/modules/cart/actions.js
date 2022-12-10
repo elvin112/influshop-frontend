@@ -57,7 +57,9 @@ export default {
       throw Error("Internal server error");
     } else {
       const data = await response.json();
+      console.log(data);
       context.commit("setUserCart", data);
+      context.commit("setTotalPrice", data);
     }
   },
   async addItemToCart(context, payload) {

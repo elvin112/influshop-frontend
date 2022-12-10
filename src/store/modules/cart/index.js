@@ -7,6 +7,7 @@ const cartModule = {
   state() {
     return {
       userCart: [],
+      totalPrice: 0,
     };
   },
   getters: cartGetters,

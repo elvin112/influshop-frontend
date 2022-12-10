@@ -289,7 +289,7 @@ var cl = new Cloudinary({
   secure: true,
 });
 
-let frame1 = undefined;
+// let frame1 = undefined;
 
 export default {
   provide() {
@@ -530,6 +530,11 @@ export default {
     async featureOptionHandler(queryParam) {
       let queryParams = "";
       if (!queryParam) {
+        this.isThumb1 = false;
+        this.isThumb2 = false;
+        this.isThumb3 = false;
+        this.isThumb4 = false;
+        this.isThumb5 = false;
         this.isFeedbackReceived = false;
         const featureSelectNodes =
           document.getElementsByClassName("feature-select");
@@ -551,16 +556,32 @@ export default {
       } else {
         queryParams = queryParam;
       }
-
-      const response = await fetch(
-        `http://localhost:8080/api/v1/item-ops/item/${this.itemGroupOwnerName}/${this.itemGroupName}/extra?${queryParams}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      let response = null;
+      if (
+        this.$store.getters["auth/isInfluencer"] === "true" ||
+        this.$store.getters["auth/isInfluencer"] === null
+      ) {
+        response = await fetch(
+          `http://localhost:8080/api/v1/item-ops/item/${this.itemGroupOwnerName}/${this.itemGroupName}/extra?${queryParams}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } else if (this.$store.getters["auth/isInfluencer"] === "false") {
+        response = await fetch(
+          `http://localhost:8080/api/v1/item-ops/item/${this.itemGroupOwnerName}/${this.itemGroupName}/extra?${queryParams}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + this.$store.getters["auth/token"],
+            },
+          }
+        );
+      }
 
       if (!response.ok) {
         this.setItemGroupMode();
@@ -589,6 +610,7 @@ export default {
       this.itemComments = null;
       this.itemLeft = null;
       this.averageStars = null;
+
       this.loadGroupImage();
       this.loadExtraFeatures();
       const thumbNode = this.$refs["thumb-images"];
@@ -730,10 +752,48 @@ export default {
           break;
       }
     },
-    closeCommentReportPopup() {
+    closeCommentReportPopup(result) {
+      if (result === "reported") {
+        this.alertMsg = "Comment successfully reported.";
+        this.showAlertMsg = true;
+        setTimeout(() => {
+          this.showAlertMsg = false;
+        }, 5000);
+      } else if (result === "unreported") {
+        this.alertMsg = "Comment successfully unreported.";
+        this.showAlertMsg = true;
+        setTimeout(() => {
+          this.showAlertMsg = false;
+        }, 5000);
+      } else if (result === "error") {
+        this.errMsg = "Comment could not be reported!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
       this.bringCommentReportCard = false;
     },
-    closeItemReportPopup() {
+    closeItemReportPopup(result) {
+      if (result === "reported") {
+        this.alertMsg = "Item successfully reported.";
+        this.showAlertMsg = true;
+        setTimeout(() => {
+          this.showAlertMsg = false;
+        }, 5000);
+      } else if (result === "unreported") {
+        this.alertMsg = "Item successfully unreported.";
+        this.showAlertMsg = true;
+        setTimeout(() => {
+          this.showAlertMsg = false;
+        }, 5000);
+      } else if (result === "error") {
+        this.errMsg = "Item could not be reported!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
       this.bringItemReportCard = false;
     },
     commentReportPopupHandler(commentId) {
@@ -854,6 +914,7 @@ export default {
             commentId: this.itemComments[index].id + "",
             isLike: true,
           };
+          console.log(this.itemComments);
           const response = await fetch(
             `http://localhost:8080/api/v1/comment/like`,
             {
@@ -880,7 +941,7 @@ export default {
       this.isThumb3 = false;
       this.isThumb4 = false;
       this.isThumb5 = false;
-      frame1 = this.$refs["main-img"];
+      let frame1 = this.$refs["main-img"];
       let frame12 = null;
       switch (msg) {
         case "thumb-1":
@@ -923,12 +984,30 @@ export default {
     },
     loadGroupImage() {
       const imgObj = toRaw(this.itemGroupImage);
-      frame1 = this.$refs["main-img"];
+      let frame1 = this.$refs["main-img"];
       // thumbImages = this.$refs["thumb-images"];
       // thumbImages.display = "none";
       frame1.src = cl.image(imgObj).src;
     },
     loadImages() {
+      let frame1 = undefined;
+      const frame11 = this.$refs["thumb-img-1"];
+      frame11.src = "/src/assets/img/no-img-placeholder.jpeg";
+
+      const frame12 = this.$refs["thumb-img-2"];
+      frame12.src = "/src/assets/img/no-img-placeholder.jpeg";
+      const frame13 = this.$refs["thumb-img-3"];
+      frame13.src = "/src/assets/img/no-img-placeholder.jpeg";
+      const frame14 = this.$refs["thumb-img-4"];
+      frame14.src = "/src/assets/img/no-img-placeholder.jpeg";
+      const frame15 = this.$refs["thumb-img-5"];
+      frame15.src = "/src/assets/img/no-img-placeholder.jpeg";
+
+      this.isThumb1 = false;
+      this.isThumb2 = false;
+      this.isThumb3 = false;
+      this.isThumb4 = false;
+      this.isThumb5 = false;
       for (let index = 0; index < this.itemImages.length; index++) {
         const imgObj = toRaw(this.itemImages[index]);
         switch (imgObj.imageOrder) {
@@ -938,11 +1017,17 @@ export default {
             frame1.src = cl.image(imgObj.imageLocation).src;
             frame12.src = cl.image(imgObj.imageLocation).src;
             frame12.display = "inline-block";
+            this.isThumb1 = true;
+            this.isThumb2 = false;
+            this.isThumb3 = false;
+            this.isThumb4 = false;
+            this.isThumb5 = false;
             break;
           case 2:
             if (frame1 === undefined) {
               frame1 = this.$refs["main-img"];
               frame1.src = cl.image(imgObj.imageLocation).src;
+              this.isThumb2 = true;
             }
             const frame2 = this.$refs["thumb-img-2"];
             frame2.src = cl.image(imgObj.imageLocation).src;
@@ -952,6 +1037,7 @@ export default {
             if (frame1 === undefined) {
               frame1 = this.$refs["main-img"];
               frame1.src = cl.image(imgObj.imageLocation).src;
+              this.isThumb3 = true;
             }
             const frame3 = this.$refs["thumb-img-3"];
             frame3.src = cl.image(imgObj.imageLocation).src;
@@ -961,6 +1047,7 @@ export default {
             if (frame1 === undefined) {
               frame1 = this.$refs["main-img"];
               frame1.src = cl.image(imgObj.imageLocation).src;
+              this.isThumb4 = true;
             }
             const frame4 = this.$refs["thumb-img-4"];
             frame4.src = cl.image(imgObj.imageLocation).src;
@@ -970,10 +1057,11 @@ export default {
             if (frame1 === undefined) {
               frame1 = this.$refs["main-img"];
               frame1.src = cl.image(imgObj.imageLocation).src;
+              this.isThumb5 = true;
             }
             const frame5 = this.$refs["thumb-img-5"];
             frame5.src = cl.image(imgObj.imageLocation).src;
-            frame5.display = "none";
+            frame5.display = "inline-block";
             break;
         }
       }

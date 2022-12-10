@@ -1,6 +1,6 @@
 <template>
   <div class="sidebar-wrapper">
-    <h1>This is sidebar!</h1>
+    <!-- <h1>This is sidebar!</h1> -->
   </div>
 </template>
 

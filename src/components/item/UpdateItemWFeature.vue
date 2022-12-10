@@ -314,6 +314,7 @@ export default {
         this.itemDescription = item.description;
         this.itemPrice = item.price;
         this.itemImages = item.images;
+        this.itemQuantity = item.quantity;
         this.loadItemImages();
         const firstPropEl = this.$refs["property-name-first-row"];
         const firstContentEl = this.$refs["content-name-first-row"];

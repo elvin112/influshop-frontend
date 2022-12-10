@@ -26,6 +26,17 @@
             <input type="radio" id="four" value="other" v-model="picked" />
             <label for="four">Other</label>
           </div>
+
+          <p class="report-progress-info" v-if="isReportControlled">
+            Request rejected!
+          </p>
+          <p
+            class="report-progress-info"
+            v-else-if="isReportControlled === false"
+            style="color: red"
+          >
+            Your request is reviewed.
+          </p>
         </div>
       </div>
     </template>
@@ -67,6 +78,7 @@ export default {
       picked: "title",
       alreadyReported: false,
       prevRepReason: null,
+      isReportControlled: null,
     };
   },
 
@@ -118,6 +130,7 @@ export default {
           this.picked = "other";
         }
         this.alreadyReported = true;
+        this.isReportControlled = data.commentReport.isReportControlled;
       }
     }
   },
@@ -168,23 +181,30 @@ export default {
         isReporterUser: isUser,
         isReport: isReport,
       };
-      const response = await fetch(
-        `http://localhost:8080/api/v1/report/comment/create`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + this.$store.getters["auth/token"],
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/v1/report/comment/create`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + this.$store.getters["auth/token"],
+            },
+            body: JSON.stringify(payload),
+          }
+        );
 
-      if (!response.ok) {
-        throw Error("Something went wrong");
-      } else {
-        alert("OK!");
-        this.closeCommentReportPopup();
+        if (!response.ok) {
+          throw Error("Something went wrong");
+        } else {
+          if (isReport) {
+            this.closeCommentReportPopup("reported");
+          } else {
+            this.closeCommentReportPopup("unreported");
+          }
+        }
+      } catch (error) {
+        this.closeCommentReportPopup("error");
       }
     },
   },

@@ -231,7 +231,6 @@ export default {
         this.errorMsg = "Something weng wrong - try again later!";
       } else {
         const data = await response.json();
-        console.log(data);
         if (this.currentPage >= 2) {
           if (data.item.length !== 0) {
             this.items = this.items.concat(data.item);

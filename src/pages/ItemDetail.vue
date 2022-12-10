@@ -527,10 +527,48 @@ export default {
           break;
       }
     },
-    closeCommentReportPopup() {
+    closeCommentReportPopup(result) {
+      if (result === "reported") {
+        this.alertMsg = "Comment successfully reported.";
+        this.showAlertMsg = true;
+        setTimeout(() => {
+          this.showAlertMsg = false;
+        }, 5000);
+      } else if (result === "unreported") {
+        this.alertMsg = "Comment successfully unreported.";
+        this.showAlertMsg = true;
+        setTimeout(() => {
+          this.showAlertMsg = false;
+        }, 5000);
+      } else if (result === "error") {
+        this.errMsg = "Comment could not be reported!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
       this.bringCommentReportCard = false;
     },
-    closeItemReportPopup() {
+    closeItemReportPopup(result) {
+      if (result === "reported") {
+        this.alertMsg = "Item successfully reported.";
+        this.showAlertMsg = true;
+        setTimeout(() => {
+          this.showAlertMsg = false;
+        }, 5000);
+      } else if (result === "unreported") {
+        this.alertMsg = "Item successfully unreported.";
+        this.showAlertMsg = true;
+        setTimeout(() => {
+          this.showAlertMsg = false;
+        }, 5000);
+      } else if (result === "error") {
+        this.errMsg = "Item could not be reported!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
       this.bringItemReportCard = false;
     },
     commentReportPopupHandler(commentId) {

@@ -1,9 +1,20 @@
 <template>
   <header>
     <TheHeader />
+    <Transition>
+      <ErrorMsg v-if="showErrMsg" :msg="errMsg" />
+    </Transition>
+    <Transition>
+      <SimpleAlertMsg v-if="showAlertMsg" :msg="alertMsg" />
+    </Transition>
   </header>
 
   <div class="wrapper">
+    <InfluencerReport
+      v-if="bringInfluencerReportCard"
+      :influencerUsername="influencerName"
+    />
+
     <TheSidebar />
     <span v-if="isLoading" class="error-msg">
       <LoadingSpinner class="color-primary-3"
@@ -23,10 +34,7 @@
 
         <span
           class="influencer-info__report"
-          @click="
-            {
-            }
-          "
+          @click="influencerReportPopupHandler"
         >
           <svg class="report__icon">
             <use xlink:href="../assets/img/sprite.svg#icon-warning" />
@@ -127,6 +135,9 @@
 <script>
 import { isProxy, toRaw } from "vue";
 import { Cloudinary } from "cloudinary-core"; // If your code is for ES6 or higher
+
+import InfluencerReport from "../components/report/InfluencerReport.vue";
+
 var cl = new Cloudinary({
   cloud_name: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
   secure: true,
@@ -137,10 +148,21 @@ export default {
     return {
       isLoading: true,
       errorMsg: "",
+      errMsg: "Something went wrong!",
+      alertMsg: "Process done!",
+      showAlertMsg: false,
+
+      showErrMsg: false,
       items: [],
       pinnedItem: null,
       influencerName: null,
       itemImages: [],
+      bringInfluencerReportCard: false,
+    };
+  },
+  provide() {
+    return {
+      closeInfluencerReportPopup: this.closeInfluencerReportPopup,
     };
   },
   async mounted() {
@@ -152,6 +174,31 @@ export default {
     this.loadPinnedItem();
   },
   methods: {
+    influencerReportPopupHandler() {
+      this.bringInfluencerReportCard = true;
+    },
+    closeInfluencerReportPopup(result) {
+      if (result === "reported") {
+        this.alertMsg = "Influencer successfully reported.";
+        this.showAlertMsg = true;
+        setTimeout(() => {
+          this.showAlertMsg = false;
+        }, 5000);
+      } else if (result === "unreported") {
+        this.alertMsg = "Influencer successfully unreported.";
+        this.showAlertMsg = true;
+        setTimeout(() => {
+          this.showAlertMsg = false;
+        }, 5000);
+      } else if (result === "error") {
+        this.errMsg = "Influencer could not be reported!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
+      this.bringInfluencerReportCard = false;
+    },
     async addItemToFavorites(id, mode) {
       if (this.$store.getters["auth/token"]) {
         if (this.$store.getters["auth/isInfluencer"] === "true") {
@@ -176,24 +223,16 @@ export default {
           throw errMsg;
         } else {
           // alert("Item added!");
-          if (mode) {
-            this.alertMsg = "Item added to favorites";
-          } else {
-            this.alertMsg = "Item removed from favorites";
-          }
-          this.showAlertMsg = true;
+
           for (let index = 0; index < this.items.length; index++) {
             if (this.items[index].id === id) {
               console.log(this.items[index]);
               this.items[index].isFavorite = !this.items[index].isFavorite;
             }
           }
-          setTimeout(() => {
-            this.showAlertMsg = false;
-          }, 5000);
         }
       } catch (error) {
-        this.errMsg = error?.message || "Item could not be added!";
+        this.errMsg = error.message || "Item could not be added!";
         this.showErrMsg = true;
         setTimeout(() => {
           this.showErrMsg = false;
@@ -250,6 +289,9 @@ export default {
         this.items = data.items;
       }
     },
+  },
+  components: {
+    InfluencerReport,
   },
 };
 </script>

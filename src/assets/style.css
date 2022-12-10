@@ -85,6 +85,13 @@ h6 {
   font-size: 1rem;
 }
 
+.report-progress-info {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+  margin-top: 1.5rem;
+  color: red;
+}
+
 .content input {
   width: 90%;
 }

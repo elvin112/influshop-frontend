@@ -3,7 +3,7 @@
     <template #header>
       <h2 class="header__title">
         Reporting abuse
-        <svg class="close-sign__icon" @click="this.closeItemReportPopup">
+        <svg class="close-sign__icon" @click="this.closeInfluencerReportPopup">
           <use xlink:href="../../assets/img/sprite.svg#icon-close" />
         </svg>
       </h2>
@@ -13,13 +13,13 @@
       <div class="item-report-container">
         <div class="item-report-container__content">
           <div class="radio-control">
-            <input type="radio" id="one" value="title" v-model="picked" />
-            <label for="one">Inappropriate title</label>
+            <input type="radio" id="one" value="username" v-model="picked" />
+            <label for="one">Inappropriate username</label>
           </div>
 
           <div class="radio-control">
             <input type="radio" id="two" value="description" v-model="picked" />
-            <label for="two">Inappropriate description</label>
+            <label for="two">Inappropriate shop description</label>
           </div>
 
           <div class="radio-control">
@@ -50,22 +50,22 @@
         <button
           class="btn btn--cancel"
           type="submit"
-          @click="reportItemHandler(true)"
+          @click="reportInfluencerHandler(true)"
         >
           Report
         </button>
-        <button class="btn btn--success" @click="closeItemReportPopup()">
+        <button class="btn btn--success" @click="closeInfluencerReportPopup()">
           Cancel
         </button>
       </div>
       <div v-else class="form-button-control-2">
-        <button class="btn btn--success" @click="updateReportItemHandler">
+        <button class="btn btn--success" @click="updateReportInfluencerHandler">
           Update
         </button>
         <button
           class="btn btn--cancel"
           type="submit"
-          @click="unreportItemHandler()"
+          @click="unreportInfluencerHandler()"
         >
           Unreport
         </button>
@@ -76,8 +76,8 @@
 
 <script>
 export default {
-  inject: ["closeItemReportPopup"],
-  props: ["itemId"],
+  inject: ["closeInfluencerReportPopup"],
+  props: ["influencerUsername"],
   data() {
     return {
       picked: "title",
@@ -101,12 +101,12 @@ export default {
       return;
     }
     const payload = {
-      itemId: this.itemId,
+      username: this.influencerUsername,
       isReaderUser: isUser,
     };
 
     const response = await fetch(
-      `http://localhost:8080/api/v1/report/item/read`,
+      `http://localhost:8080/api/v1/report/influencer/read`,
       {
         method: "POST",
         headers: {
@@ -121,14 +121,15 @@ export default {
       throw Error("Something went wrong");
     } else {
       const data = await response.json();
-      if (data.message.includes("Item Report Not Found")) {
+      if (data.message.includes("Influencer Not Found")) {
         return;
       } else {
-        const reason = data.itemReport.report;
+        const reason = data.influencerReport.report;
+        console.log(reason);
         this.prevRepReason = reason;
-        if (reason === "INAPPROPRIATE_TITLE") {
-          this.picked = "title";
-        } else if (reason === "INAPPROPRIATE_DESCRIPTION") {
+        if (reason === "INAPPROPRIATE_USERNAME") {
+          this.picked = "username";
+        } else if (reason === "INAPPROPRIATE_SHOP_DESCRIPTION") {
           this.picked = "description";
         } else if (reason === "INAPPROPRIATE_IMAGE") {
           this.picked = "image";
@@ -136,20 +137,20 @@ export default {
           this.picked = "other";
         }
         this.alreadyReported = true;
-        this.isReportControlled = data.itemReport.isReportControlled;
+        this.isReportControlled = data.influencerReport.isReportControlled;
       }
     }
   },
   methods: {
-    async unreportItemHandler() {
-      this.reportItemHandler(false);
+    async unreportInfluencerHandler() {
+      this.reportInfluencerHandler(false);
     },
-    async updateReportItemHandler() {
+    async updateReportInfluencerHandler() {
       let currentReason = null;
-      if (this.picked === "title") {
-        currentReason = "INAPPROPRIATE_TITLE";
+      if (this.picked === "username") {
+        currentReason = "INAPPROPRIATE_USERNAME";
       } else if (this.picked === "description") {
-        currentReason = "INAPPROPRIATE_DESCRIPTION";
+        currentReason = "INAPPROPRIATE_SHOP_DESCRIPTION";
       } else if (this.picked === "image") {
         currentReason = "INAPPROPRIATE_IMAGE";
       } else {
@@ -159,10 +160,10 @@ export default {
       if (currentReason === this.prevRepReason) {
         return;
       } else {
-        this.reportItemHandler(true);
+        this.reportInfluencerHandler(true);
       }
     },
-    async reportItemHandler(isReport) {
+    async reportInfluencerHandler(isReport) {
       let pickedReportType = null;
       let isUser = null;
 
@@ -172,10 +173,10 @@ export default {
         isUser = false;
       }
 
-      if (this.picked === "title") {
-        pickedReportType = "INAPPROPRIATE_TITLE";
+      if (this.picked === "username") {
+        pickedReportType = "INAPPROPRIATE_USERNAME";
       } else if (this.picked === "description") {
-        pickedReportType = "INAPPROPRIATE_DESCRIPTION";
+        pickedReportType = "INAPPROPRIATE_SHOP_DESCRIPTION";
       } else if (this.picked === "image") {
         pickedReportType = "INAPPROPRIATE_IMAGE";
       } else {
@@ -186,14 +187,14 @@ export default {
       }
 
       const payload = {
-        itemId: this.itemId,
+        username: this.influencerUsername,
         reason: pickedReportType,
         isReporterUser: isUser,
         isReport: isReport,
       };
       try {
         const response = await fetch(
-          `http://localhost:8080/api/v1/report/item/create`,
+          `http://localhost:8080/api/v1/report/influencer/create`,
           {
             method: "POST",
             headers: {
@@ -208,13 +209,13 @@ export default {
           throw Error("Something went wrong");
         } else {
           if (isReport) {
-            this.closeItemReportPopup("reported");
+            this.closeInfluencerReportPopup("reported");
           } else {
-            this.closeItemReportPopup("unreported");
+            this.closeInfluencerReportPopup("unreported");
           }
         }
       } catch (error) {
-        this.closeItemReportPopup("error");
+        this.closeInfluencerReportPopup("error");
       }
     },
   },

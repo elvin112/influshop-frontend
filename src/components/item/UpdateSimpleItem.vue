@@ -199,6 +199,8 @@ export default {
     this.itemName = this.itemToUpdate.name;
     this.itemDescription = this.itemToUpdate.description;
     this.itemPrice = this.itemToUpdate.price;
+    console.log(this.itemToUpdate);
+    this.itemQuantity = this.itemToUpdate.quantity;
     this.isPinned = this.itemToUpdate.isPinned ? "yes" : "no";
     this.itemId = this.itemToUpdate.id;
     this.fetchItemImages();

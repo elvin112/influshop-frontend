@@ -333,7 +333,8 @@
         .quantityWprice {
           display: flex;
           justify-content: space-between;
-          align-items: baseline;
+          align-items: flex-end;
+
           &__quantity {
             width: 5rem;
             text-align: center;

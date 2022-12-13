@@ -167,7 +167,7 @@ export default {
 
       const data = await response.json();
       if (response.ok) {
-        alert("User Successfully Logged In!");
+        this.$router.push("/");
       } else {
         if (data.status === 401) {
           if (data.message === "Invalid email or password") {

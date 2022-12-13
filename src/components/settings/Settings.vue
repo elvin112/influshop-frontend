@@ -2,12 +2,14 @@
   <nav class="main-tab">
     <ul class="main-tab-group">
       <li class="main-tab-group__item">
-        <router-link to="/">Account Setting</router-link>
+        <router-link to="/userSettings/settings/account"
+          >Account Setting</router-link
+        >
       </li>
       <li class="main-tab-group__item">
         <router-link to="/">Login & Security</router-link>
       </li>
-      <li class="main-tab-group__item">
+      <li class="main-tab-group__item" v-if="isInfluencer">
         <router-link to="/userSettings/settings/store">My Store</router-link>
       </li>
     </ul>
@@ -19,7 +21,12 @@
 <script>
 export default {
   mounted() {
-    this.$router.push("/userSettings/settings/store");
+    this.$router.push("/userSettings/settings/account");
+  },
+  computed: {
+    isInfluencer() {
+      if (this.$store.getters["auth/isInfluencer"] === "true") return true;
+    },
   },
 };
 </script>

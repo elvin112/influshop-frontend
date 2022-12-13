@@ -51,6 +51,9 @@
               }}</span>
             </li>
           </router-link>
+          <li class="header-nav__cart avatar" v-if="showCart">
+            <UserMenu />
+          </li>
         </ul>
       </nav>
     </div>
@@ -58,7 +61,10 @@
 </template>
 
 <script>
+import UserMenu from "./UserMenu.vue";
+
 export default {
+  components: { UserMenu },
   computed: {
     showCart() {
       if (this.$store.getters["auth/token"]) {

@@ -128,6 +128,9 @@ export default {
     await this.loadItems();
     this.isLoading = false;
     window.addEventListener("scroll", this.loadNewItems);
+
+    this.$store.dispatch("cart/fetchUserCart");
+    this.$store.dispatch("favorite/fetchUserFavorites");
   },
   methods: {
     closeErrMsg() {

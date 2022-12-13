@@ -6,8 +6,8 @@
 import { RouterLink, RouterView } from "vue-router";
 
 export default {
-  created() {
-    this.$store.dispatch("auth/tryLogin");
+  async created() {
+    await this.$store.dispatch("auth/tryLogin");
 
     if (this.$store.getters["auth/token"]) {
       if (this.$store.getters["auth/isInfluencer"] === "false") {

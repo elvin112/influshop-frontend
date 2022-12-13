@@ -6,6 +6,7 @@ import UserSettings from "../pages/UserSettings.vue";
 import Settings from "../components/settings/Settings.vue";
 import AddItem from "../components/item/AddItem.vue";
 import StoreSettings from "../components/item/StoreSettings.vue";
+import AccountSettings from "../components/settings/AccountSettings.vue";
 import ItemDetail from "../pages/ItemDetail.vue";
 import ItemGroupDetail from "../pages/ItemGroupDetail.vue";
 import InfluencerPage from "../pages/InfluencerPage.vue";
@@ -51,6 +52,11 @@ const router = createRouter({
                   component: AddItem,
                 },
               ],
+            },
+            {
+              path: "/userSettings/settings/account",
+              name: "accountSettings",
+              component: AccountSettings,
             },
           ],
         },

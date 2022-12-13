@@ -1,4 +1,5 @@
 let timer;
+import router from "../../../router/index";
 export default {
   async signin(context, payload) {
     const response = await fetch(
@@ -16,7 +17,6 @@ export default {
     );
 
     const responseData = await response.clone().json();
-    console.log(responseData);
     if (!response.ok) {
       return response.clone();
     }
@@ -92,6 +92,7 @@ export default {
       token: null,
       isInfluencer: null,
     });
+    router.push("/signin");
   },
 
   autoLogout(context) {

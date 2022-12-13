@@ -8,4 +8,7 @@ export default {
   isInfluencer(state) {
     return state.isInfluencer;
   },
+  isAuthenticated(state) {
+    return !!state.token;
+  },
 };

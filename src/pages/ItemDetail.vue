@@ -459,26 +459,42 @@ export default {
     async feedbackHandler(numOfStar) {
       this.currentStar = numOfStar;
       // check whether item is purchased by the user
-      const response = await fetch(
-        `http://localhost:8080/api/v1/comment/is-purchased/${this.itemId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + this.$store.getters["auth/token"],
-          },
-        }
-      );
+      console.log("running");
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/v1/comment/is-purchased/${this.itemId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + this.$store.getters["auth/token"],
+            },
+          }
+        );
 
-      if (!response.ok) {
-        return;
-      } else {
-        const data = await response.json();
-        if (data.isPurchased === false) {
+        if (!response.ok) {
+          const data = response.json();
+          throw Error(data);
           return;
         } else {
-          this.bringItemFeedbackCard = true;
+          const data = await response.json();
+          if (data.isPurchased === false) {
+            this.alertMsg = "You haven't purchased this item before.";
+            this.showAlertMsg = true;
+            setTimeout(() => {
+              this.showAlertMsg = false;
+            }, 3000);
+            return;
+          } else {
+            this.bringItemFeedbackCard = true;
+          }
         }
+      } catch (error) {
+        this.errMsg = "You need to login.";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 3000);
       }
     },
     cancelHoveringStart() {

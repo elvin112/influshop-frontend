@@ -193,7 +193,11 @@
         </div>
         <div class="order-specification__buttons mt-sm">
           <!-- <button class="btn btn--outline">Add to Cart</button> -->
-          <button @click="addToCartHandler" class="btn btn--primary mb-sm">
+          <button
+            @click="addToCartHandler"
+            class="btn btn--primary mb-sm"
+            :disabled="itemLeft <= 0"
+          >
             Add to Cart
           </button>
         </div>

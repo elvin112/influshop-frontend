@@ -264,7 +264,8 @@ export default {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                Authorization: "Bearer " + this.$store.getters["auth/token"],
+                // uncomment below after fix in the backend
+                // Authorization: "Bearer " + this.$store.getters["auth/token"],
               },
             }
           );

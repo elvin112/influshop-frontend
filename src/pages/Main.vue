@@ -180,11 +180,7 @@ export default {
       this.searchChangeHandler();
     },
   },
-  computed: {
-    linkGenerator() {
-      return;
-    },
-  },
+
   async mounted() {
     this.isLoading = true;
     this.errorMsg = null;

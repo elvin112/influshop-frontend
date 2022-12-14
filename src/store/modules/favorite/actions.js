@@ -10,12 +10,19 @@ export default {
         },
       }
     );
-
     if (!response.ok) {
       throw Error("Internal server error");
     } else {
       const data = await response.json();
-      context.commit("setUserFavorites", data);
+      const formattedData = [];
+      for (let index = 0; index < data.length; index++) {
+        const element = data[index];
+        if (JSON.stringify(element) === "{}") {
+          continue;
+        }
+        formattedData.push(element);
+      }
+      context.commit("setUserFavorites", formattedData);
     }
   },
   async addItemToFavorites(context, payload) {

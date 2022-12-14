@@ -303,7 +303,7 @@ export default {
     };
   },
   async created() {
-    this.loadProduct(true);
+    await this.loadProduct(true);
   },
   computed: {
     username() {
@@ -432,7 +432,7 @@ export default {
           }
         );
       }
-      if (!response.ok) {
+      if (!response?.ok) {
         alert("Something went wrong!");
       } else {
         const data = await response.json();

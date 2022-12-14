@@ -220,7 +220,7 @@
           <button class="btn btn--success" type="submit">Save</button>
           <button
             class="btn btn--cancel"
-            @click="closeUpdateItemWFeaturePopup()"
+            @click="closeUpdateItemWFeaturePopup('cancel')"
           >
             Cancel
           </button>
@@ -390,8 +390,6 @@ export default {
         itemQuantity: this.itemQuantity,
       };
 
-      console.log(payload);
-
       const response = await fetch(
         `http://localhost:8080/api/v1/item-ops/item`,
         {
@@ -405,11 +403,9 @@ export default {
       );
 
       if (!response.ok) {
-        alert("Something went wrong!");
+        this.closeUpdateItemWFeaturePopup(false);
       } else {
-        alert("Item updated!");
-        console.log(await response.json());
-        this.closeUpdateItemWFeaturePopup();
+        this.closeUpdateItemWFeaturePopup(true);
       }
     },
     async loadItemImages() {

@@ -252,6 +252,20 @@
           ></div>
 
           <div class="property-content-container">
+            <button
+              type="button"
+              class="btn btn--tertiary"
+              @click="addPropContentField"
+              :class="{ disabled: isAddFieldDisabled }"
+            >
+              <svg class="input-icon-plus-circle">
+                <use
+                  xlink:href="../../assets/img/sprite.svg#icon-plus-circle"
+                />
+              </svg>
+              Add field
+            </button>
+
             <br />
             <div class="property">
               <label for="property-name">Property:</label>
@@ -273,19 +287,6 @@
                 ref="content-name-first-row"
               />
             </div>
-            <button
-              type="button"
-              class="btn btn--tertiary"
-              @click="addPropContentField"
-              :class="{ disabled: isAddFieldDisabled }"
-            >
-              <svg class="input-icon-plus-circle">
-                <use
-                  xlink:href="../../assets/img/sprite.svg#icon-plus-circle"
-                />
-              </svg>
-              Add field
-            </button>
           </div>
 
           <div
@@ -506,6 +507,7 @@ export default {
 
             if (response.ok) {
               alert("Item with extra feature added!");
+              this.closePopup();
             }
           }
         } catch (error) {
@@ -681,7 +683,6 @@ export default {
             isPinned: this.isPinnedFormatted,
             itemImages: itemImages,
           };
-          console.log("running in submitHandler...");
 
           const response = await this.$store.dispatch(
             "influencer/addItem",

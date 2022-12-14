@@ -50,8 +50,7 @@ export default {
 
       if (!response.ok) {
         if (response.status === 404) {
-          alert("Item not found!");
-          return;
+          throw Error();
         }
         // throw Error("Internal server error");
       } else {
@@ -75,7 +74,6 @@ export default {
       if (payload.itemType === "item") {
         context.commit("deleteInfluencerItem", payload.itemId);
       }
-      alert("item deleted!");
       context.dispatch("fetchInfluencerItems");
     }
   },

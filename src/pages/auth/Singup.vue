@@ -193,11 +193,9 @@ export default {
 
       const data = await response.json();
 
-      console.log(data.status);
-      console.log(data.message);
-
       if (response.ok) {
-        alert(data.message);
+        // alert(data.message);
+        this.$router.push("/signin");
       } else if (!response.ok && data) {
         if (data.message.includes("Username already exists")) {
           this.usernameErrorMessage = data.message;

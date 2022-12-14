@@ -27,8 +27,19 @@
       <BaseLogo />
       <nav class="header-nav">
         <ul>
+          <router-link to="/signin" v-if="!isAuthenticated">
+            <li class="login-register">
+              <p>Login</p>
+            </li>
+          </router-link>
+          <router-link to="/signup" v-if="!isAuthenticated">
+            <li class="login-register">
+              <p>Register</p>
+            </li>
+          </router-link>
+
           <router-link to="/favorites">
-            <li class="header-nav__favorite" v-if="showCart">
+            <li class="header-nav__favorite" v-if="isUser">
               <svg class="favorite-icon">
                 <use xlink:href="../../assets/img/sprite.svg#icon-heart" />
               </svg>
@@ -40,7 +51,7 @@
             </li>
           </router-link>
           <router-link to="/cart">
-            <li class="header-nav__cart" v-if="showCart">
+            <li class="header-nav__cart" v-if="isUser">
               <svg class="cart-icon">
                 <use
                   xlink:href="../../assets/img/sprite.svg#icon-shopping_bag"
@@ -51,7 +62,7 @@
               }}</span>
             </li>
           </router-link>
-          <li class="header-nav__cart avatar" v-if="showCart">
+          <li class="header-nav__cart avatar" v-if="isUser || isInfluencer">
             <UserMenu />
           </li>
         </ul>
@@ -66,9 +77,18 @@ import UserMenu from "./UserMenu.vue";
 export default {
   components: { UserMenu },
   computed: {
-    showCart() {
+    isAuthenticated() {
+      return this.$store.getters["auth/isAuthenticated"];
+    },
+    isUser() {
       if (this.$store.getters["auth/token"]) {
         if (this.$store.getters["auth/isInfluencer"] === "false") return true;
+      }
+      return false;
+    },
+    isInfluencer() {
+      if (this.$store.getters["auth/token"]) {
+        if (this.$store.getters["auth/isInfluencer"] === "true") return true;
       }
       return false;
     },
@@ -84,4 +104,18 @@ export default {
 
 <style scoped lang="scss">
 @import "TheHeader.module.scss";
+
+a {
+  text-decoration: none;
+}
+
+.login-register {
+  padding: 1rem;
+  color: black;
+}
+
+.login-register:hover {
+  padding: 1rem;
+  color: rgb(126, 123, 123);
+}
 </style>

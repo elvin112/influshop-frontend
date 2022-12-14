@@ -167,7 +167,8 @@ export default {
 
       const data = await response.json();
       if (response.ok) {
-        this.$router.push("/");
+        await this.$router.push({ path: "/main" });
+        this.$router.go(0);
       } else {
         if (data.status === 401) {
           if (data.message === "Invalid email or password") {

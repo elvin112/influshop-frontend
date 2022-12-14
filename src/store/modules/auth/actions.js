@@ -99,5 +99,6 @@ export default {
     console.log("autoLogout started!");
     context.dispatch("logout");
     context.commit("setAutoLogout");
+    router.push("/signin");
   },
 };

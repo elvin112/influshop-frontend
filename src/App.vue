@@ -6,6 +6,12 @@
 import { RouterLink, RouterView } from "vue-router";
 
 export default {
+  provide() {
+    return {
+      isMenuOpen: false,
+    };
+  },
+
   async created() {
     await this.$store.dispatch("auth/tryLogin");
 

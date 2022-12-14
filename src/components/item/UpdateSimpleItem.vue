@@ -176,7 +176,10 @@
 
         <div class="form-button-control">
           <button class="btn btn--success" type="submit">Save</button>
-          <button class="btn btn--cancel" @click="closeUpdateFlatItemPopup()">
+          <button
+            class="btn btn--cancel"
+            @click="closeUpdateFlatItemPopup('cancel')"
+          >
             Cancel
           </button>
         </div>
@@ -266,10 +269,11 @@ export default {
       );
 
       if (!response.ok) {
-        alert("Something went wrong!");
+        // alert("Something went wrong!");
+        this.closeUpdateFlatItemPopup(false);
       } else {
-        alert("Item updated!");
-        this.closeUpdateFlatItemPopup();
+        // alert("Item updated!");
+        this.closeUpdateFlatItemPopup(true);
       }
     },
     async fetchItemImages() {

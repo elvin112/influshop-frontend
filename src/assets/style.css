@@ -93,11 +93,11 @@ h6 {
 }
 
 .content input {
-  width: 90%;
+  width: 100%;
 }
 
 .property input {
-  width: 60%;
+  width: 100%;
 }
 
 .input-icon-bin {
@@ -108,7 +108,7 @@ h6 {
 
 .prop-cont-extra-container {
   display: grid;
-  grid-template-columns: 40% 1fr;
+  grid-template-columns: 1fr 1fr;
 }
 
 .update-prop-cont-extra-container {

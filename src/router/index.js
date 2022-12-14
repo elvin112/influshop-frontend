@@ -12,6 +12,7 @@ import ItemGroupDetail from "../pages/ItemGroupDetail.vue";
 import InfluencerPage from "../pages/InfluencerPage.vue";
 import Cart from "../pages/Cart.vue";
 import Favorites from "../pages/Favorites.vue";
+import store from "../store/index";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,21 +36,27 @@ const router = createRouter({
       path: "/userSettings",
       name: "userSettings",
       component: UserSettings,
+      meta: { requiresAuth: true },
       children: [
         {
           path: "/userSettings/settings",
           name: "settings",
           component: Settings,
+          meta: { requiresAuth: true },
+
           children: [
             {
               path: "/userSettings/settings/store",
               name: "storeSettings",
               component: StoreSettings,
+              meta: { requiresAuth: true },
+
               children: [
                 {
                   path: "/userSettings/settings/store/addNew",
                   name: "addNewItem",
                   component: AddItem,
+                  meta: { requiresAuth: true },
                 },
               ],
             },
@@ -57,6 +64,7 @@ const router = createRouter({
               path: "/userSettings/settings/account",
               name: "accountSettings",
               component: AccountSettings,
+              meta: { requiresAuth: true },
             },
           ],
         },
@@ -81,14 +89,26 @@ const router = createRouter({
       path: "/cart",
       name: "cart",
       component: Cart,
+      meta: { requiresAuth: true },
     },
     {
       path: "/favorites",
       name: "favorites",
       component: Favorites,
+      meta: { requiresAuth: true },
     },
   ],
   linkActiveClass: "active",
+});
+
+router.beforeEach((to, from, next) => {
+  if (
+    to.name !== "signin" &&
+    to.meta.requiresAuth &&
+    !store.getters["auth/isAuthenticated"]
+  )
+    next({ name: "signin" });
+  else next();
 });
 
 export default router;

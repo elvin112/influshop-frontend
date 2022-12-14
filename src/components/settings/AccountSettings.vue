@@ -15,6 +15,8 @@
     :caType="caType"
   />
 
+  <AccountDeletionPopup v-if="bringAccDeletionPopup" />
+
   <div class="wrapper">
     <div class="profile">
       <div class="profile-img">
@@ -156,10 +158,7 @@
         </div>
       </div>
     </div>
-    <button
-      class="action-delete btn btn--primary"
-      @click="deleteAccountHandler"
-    >
+    <button class="action-delete btn btn--primary" @click="deleteAccHandler">
       Delete Acount
     </button>
   </div>
@@ -171,6 +170,7 @@ import { Cloudinary } from "cloudinary-core"; // If your code is for ES6 or high
 
 import CADeletionPopup from "../feedback/CADeletionPopup.vue";
 import CAUpdatePopup from "../feedback/CAUpdatePopup.vue";
+import AccountDeletionPopup from "../feedback/AccountDeletionPopup.vue";
 
 var cl = new Cloudinary({
   cloud_name: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
@@ -185,6 +185,7 @@ export default {
       deleteCAHandler: this.deleteCAHandler,
       closeCADeletionPopup: this.closeCADeletionPopup,
       closeCAUpdatePopup: this.closeCAUpdatePopup,
+      closeAccountDeletionPopup: this.closeAccountDeletionPopup,
     };
   },
   mounted() {
@@ -221,38 +222,22 @@ export default {
       address: null,
       card: null,
       caType: "",
+      bringAccDeletionPopup: false,
     };
   },
   methods: {
-    async deleteAccountHandler() {
-      let url;
-
-      if (this.$store.getters["auth/isInfluencer"] === "true") {
-        url = "http://localhost:8080/api/v1/settingss/influencer";
-      } else if (this.$store.getters["auth/isInfluencer"] === "false") {
-        url = "http://localhost:8080/api/v1/settingss/user";
-      }
-      try {
-        const response = await fetch(url, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + this.$store.getters["auth/token"],
-          },
-        });
-
-        if (!response.ok) {
-          throw Error();
-        } else {
-          this.logoutHandler();
-        }
-      } catch (error) {
+    deleteAccHandler() {
+      this.bringAccDeletionPopup = true;
+    },
+    async closeAccountDeletionPopup(response) {
+      if (response === false) {
         this.errMsg = "Account could not be deleted!";
         this.showErrMsg = true;
         setTimeout(() => {
           this.showErrMsg = false;
         }, 5000);
       }
+      this.bringAccDeletionPopup = false;
     },
     logoutHandler() {
       this.$store.dispatch("auth/logout");
@@ -341,7 +326,6 @@ export default {
         } else {
           const data = await response.json();
           this.userAddresses = data.addresses;
-          console.log(this.userAddresses);
         }
       } catch (error) {
         this.errMsg = "Address could not be fetched!";
@@ -514,7 +498,7 @@ export default {
       this.lName = name[1];
     },
   },
-  components: { CADeletionPopup, CAUpdatePopup },
+  components: { CADeletionPopup, CAUpdatePopup, AccountDeletionPopup },
 };
 </script>
 

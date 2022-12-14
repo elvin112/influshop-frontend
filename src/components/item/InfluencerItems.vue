@@ -1,4 +1,10 @@
 <template>
+  <Transition>
+    <ErrorMsg v-if="showErrMsg" :msg="errMsg" />
+  </Transition>
+  <Transition>
+    <SimpleAlertMsg v-if="showAlertMsg" :msg="alertMsg" />
+  </Transition>
   <h2 v-if="isLoading">Loading...</h2>
   <div class="wrapper">
     <ItemDeletionSimplePopup v-if="bringSimpleItemDeletionCard" />
@@ -79,6 +85,10 @@ export default {
   },
   data() {
     return {
+      alertMsg: "Process done!",
+      showAlertMsg: false,
+      errMsg: "Something went wrong!",
+      showErrMsg: false,
       isLoading: false,
       itemId: null,
       itemType: null,
@@ -166,21 +176,49 @@ export default {
         this.bringItemGroupDeletionCard = true;
       }
     },
-    deleteSimpleItem() {
-      this.$store.dispatch("influencer/deleteItem", {
-        itemId: this.itemId,
-        itemType: this.itemType,
-      });
+    async deleteSimpleItem() {
+      try {
+        await this.$store.dispatch("influencer/deleteItem", {
+          itemId: this.itemId,
+          itemType: this.itemType,
+        });
+      } catch (error) {
+        this.errMsg = "Item could not be deleted!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
+
+      this.alertMsg = "Item successfully deleted.";
+      this.showAlertMsg = true;
+      setTimeout(() => {
+        this.showAlertMsg = false;
+      }, 4000);
+
       this.bringSimpleItemDeletionCard = false;
     },
-    deleteItemGroup(queryParams) {
+    async deleteItemGroup(queryParams) {
       this.bringItemGroupDeletionCard = false;
 
-      this.$store.dispatch("influencer/deleteItem", {
-        queryParams: queryParams,
-        itemName: this.itemName,
-        itemType: this.itemType,
-      });
+      try {
+        await this.$store.dispatch("influencer/deleteItem", {
+          queryParams: queryParams,
+          itemName: this.itemName,
+          itemType: this.itemType,
+        });
+        this.alertMsg = "Item successfully deleted.";
+        this.showAlertMsg = true;
+        setTimeout(() => {
+          this.showAlertMsg = false;
+        }, 4000);
+      } catch (error) {
+        this.errMsg = "Item could not be deleted!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
     },
     closeSimpleDeletionPopup() {
       this.bringSimpleItemDeletionCard = false;
@@ -188,11 +226,45 @@ export default {
     closeItemGroupDeletionPopup() {
       this.bringItemGroupDeletionCard = false;
     },
-    closeUpdateFlatItemPopup() {
+    closeUpdateFlatItemPopup(result) {
+      if (result === "cancel") {
+        this.bringFlatItemUpdateCard = false;
+        return;
+      }
+      if (result) {
+        this.alertMsg = "Item updated.";
+        this.showAlertMsg = true;
+        setTimeout(() => {
+          this.showAlertMsg = false;
+        }, 4000);
+      } else if (result === false) {
+        this.errMsg = "Item could not be updated!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
       this.bringFlatItemUpdateCard = false;
       this.fetchItems();
     },
-    closeUpdateItemWFeaturePopup() {
+    closeUpdateItemWFeaturePopup(result) {
+      if (result === "cancel") {
+        this.bringItemWFeatureUpdateCard = false;
+        return;
+      }
+      if (result) {
+        this.alertMsg = "Item updated.";
+        this.showAlertMsg = true;
+        setTimeout(() => {
+          this.showAlertMsg = false;
+        }, 4000);
+      } else if (result === false) {
+        this.errMsg = "Item could not be updated!";
+        this.showErrMsg = true;
+        setTimeout(() => {
+          this.showErrMsg = false;
+        }, 5000);
+      }
       this.bringItemWFeatureUpdateCard = false;
       this.fetchItems();
     },

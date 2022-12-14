@@ -116,7 +116,6 @@ export default {
         return;
       }
       const data = await response.json();
-      console.log(frameAvatar);
       frameAvatar.src = cl.image(data.imageLocation).src;
     },
     toggleMenu() {
@@ -135,13 +134,14 @@ export default {
   align-items: center;
 
   .drop-down {
-    background-color: var(--color-primary);
+    background-color: white;
     width: 7rem;
     height: min-content;
     position: absolute;
     top: 50%;
     transform: translateY(2%);
     border: 1px solid white;
+    padding-bottom: 5rem;
 
     ul {
       list-style: none;
@@ -152,7 +152,7 @@ export default {
     }
 
     li {
-      border-bottom: 1px solid white;
+      border-bottom: 1px solid rgb(176, 168, 168);
       padding: 0.7rem;
     }
     li:not(:last-child) {
@@ -163,7 +163,7 @@ export default {
       font-size: 1rem;
       font-family: "Montserrat", sans-serif;
       font-size: 0.85rem;
-      color: white;
+      color: black;
     }
   }
   .username {
@@ -203,6 +203,7 @@ export default {
     width: min-content;
     height: min-content;
     cursor: pointer;
+    z-index: 88;
     transform: translateY(2%);
     &__icon {
       width: 1rem;

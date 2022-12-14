@@ -15,6 +15,7 @@ import BaseCard from "./components/UI/BaseCard.vue";
 import LoadingSpinner from "./components/UI/LoadingSpinner.vue";
 import ErrorMsg from "./components/UI/ErrorMsg.vue";
 import SimpleAlertMsg from "./components/UI/SimpleAlertMsg.vue";
+import Searchbar from "./components/Searchbar.vue";
 
 const app = createApp(App);
 
@@ -26,6 +27,7 @@ app.component("BaseCard", BaseCard);
 app.component("LoadingSpinner", LoadingSpinner);
 app.component("ErrorMsg", ErrorMsg);
 app.component("SimpleAlertMsg", SimpleAlertMsg);
+app.component("Searchbar", Searchbar);
 
 app.use(BalmUI);
 app.use(BalmUIPlus);

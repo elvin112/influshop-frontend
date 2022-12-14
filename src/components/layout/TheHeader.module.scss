@@ -6,7 +6,6 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-
   .download-app {
     font-family: "Montserrat", sans-serif;
     font-size: 0.6rem;
@@ -51,6 +50,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  z-index: 999;
   .header-nav {
     ul {
       display: flex;
